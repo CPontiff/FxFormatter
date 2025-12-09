@@ -492,6 +492,122 @@
             min-width: 420px;
             min-height: 0;
         }
+        .settings-summary {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(72, 187, 120, 0.08));
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+        .theme-dark .settings-summary {
+            border-color: #4a5568;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(72, 187, 120, 0.15));
+        }
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .summary-title {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .theme-dark .summary-title { color: #e2e8f0; }
+        .summary-subtitle {
+            color: #718096;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+        .theme-dark .summary-subtitle { color: #a0aec0; }
+        .summary-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pill {
+            background: #e6f0ff;
+            color: #334266;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            border: 1px solid #cbd5e0;
+        }
+        .theme-dark .pill {
+            background: rgba(102, 126, 234, 0.12);
+            color: #c3dafe;
+            border-color: #4a5568;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .settings-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .theme-dark .settings-card {
+            background: #1f2737;
+            border-color: #4a5568;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .card-title {
+            font-weight: 700;
+            color: #2d3748;
+            font-size: 12px;
+        }
+        .theme-dark .card-title { color: #e2e8f0; }
+        .card-subtitle {
+            font-size: 10px;
+            color: #718096;
+            line-height: 1.4;
+        }
+        .theme-dark .card-subtitle { color: #a0aec0; }
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .setting-stack .setting-item:not(:last-child) {
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 6px;
+        }
+        .theme-dark .setting-stack .setting-item:not(:last-child) { border-bottom-color: #4a5568; }
+        .setting-item.inline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+        .quick-width-btns.tight { gap: 4px; }
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .settings-footer {
+            margin-top: 12px;
+        }
+        .functions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 12px;
+        }
         .tabs {
             display: flex;
             gap: 2px;
@@ -915,157 +1031,192 @@
 
                     <!-- GLOBAL TAB -->
                     <div id="global-tab" class="tab-content active">
-                        <div class="style-description" id="styleDescription"></div>
-                        
-                        <div class="section-header first">Display</div>
-                        <div class="setting-item">
-                            <label for="fontSize">Font size</label>
-                            <select id="fontSize" onchange="updateFontSize()">
-                                <option value="small">Small</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="large">Large</option>
-                                <option value="xlarge">X-Large</option>
-                            </select>
-                        </div>
-                        <div class="quick-width-btns">
-                            <button class="quick-width-btn" onclick="setWidth('30%')">30%</button>
-                            <button class="quick-width-btn" onclick="setWidth('40%')">40%</button>
-                            <button class="quick-width-btn" onclick="setWidth('50%')">50%</button>
-                            <button class="quick-width-btn" onclick="setWidth('60%')">60%</button>
+                        <div class="settings-summary">
+                            <div class="summary-header">
+                                <div>
+                                    <div class="summary-title">PowerFX formatting cockpit</div>
+                                    <div class="summary-subtitle">Tune whitespace, breaks, and call structure so the formatter mirrors your personal style.</div>
+                                </div>
+                                <div class="summary-pills">
+                                    <span class="pill">Consistent layouts</span>
+                                    <span class="pill">Iterate quickly</span>
+                                    <span class="pill">Shareable presets</span>
+                                </div>
+                            </div>
+                            <div class="style-description" id="styleDescription"></div>
                         </div>
 
-                        <div class="collapsible">
-                            <div class="collapsible-header active" onclick="toggleSection(this)">
-                                <span>INDENTATION</span>
-                                <span class="toggle-icon">▼</span>
+                        <div class="settings-grid">
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div>
+                                        <div class="card-title">Workflow & Display</div>
+                                        <div class="card-subtitle">Keep the workspace readable while you iterate.</div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="setting-item inline">
+                                        <label for="fontSize">Font size</label>
+                                        <select id="fontSize" onchange="updateFontSize()">
+                                            <option value="small">Small</option>
+                                            <option value="medium" selected>Medium</option>
+                                            <option value="large">Large</option>
+                                            <option value="xlarge">X-Large</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item inline">
+                                        <label>Container width</label>
+                                        <div class="quick-width-btns tight">
+                                            <button class="quick-width-btn" onclick="setWidth('30%')">30%</button>
+                                            <button class="quick-width-btn" onclick="setWidth('40%')">40%</button>
+                                            <button class="quick-width-btn" onclick="setWidth('50%')">50%</button>
+                                            <button class="quick-width-btn" onclick="setWidth('60%')">60%</button>
+                                        </div>
+                                    </div>
+                                    <div class="setting-item">
+                                        <div class="toggle-row">
+                                            <input type="checkbox" id="liveFormatting" checked onchange="toggleLiveFormatting()">
+                                            <label for="liveFormatting">Live formatting while typing</label>
+                                        </div>
+                                        <div class="hint">Disable to tweak options freely, then press Format when ready.</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="collapsible-content active">
-                                <div class="setting-item">
-                                    <label for="indentSize">Spaces per indent</label>
-                                    <input type="number" id="indentSize" value="2" min="0" max="8" onchange="markModified(); autoFormat()">
+
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div class="card-title">Indentation</div>
+                                    <div class="card-subtitle">Control depth and brace behavior.</div>
                                 </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="indentParams" checked onchange="markModified(); autoFormat()">
-                                    <label for="indentParams">Indent parameters</label>
+                                <div class="card-body setting-stack">
+                                    <div class="setting-item inline">
+                                        <label for="indentSize">Spaces per indent</label>
+                                        <input type="number" id="indentSize" value="2" min="0" max="8" onchange="markModified(); autoFormat()">
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="indentParams" checked onchange="markModified(); autoFormat()">
+                                        <label for="indentParams">Indent parameters</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="indentAfterComma" onchange="markModified(); autoFormat()">
+                                        <label for="indentAfterComma">Extra indent after comma</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="indentBraceContent" onchange="markModified(); autoFormat()">
+                                        <label for="indentBraceContent">Indent brace content</label>
+                                    </div>
                                 </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="indentAfterComma" onchange="markModified(); autoFormat()">
-                                    <label for="indentAfterComma">Extra indent after comma</label>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div class="card-title">Spacing & Operators</div>
+                                    <div class="card-subtitle">Make logic readable without adding clutter.</div>
                                 </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="indentBraceContent" onchange="markModified(); autoFormat()">
-                                    <label for="indentBraceContent">Indent brace content</label>
+                                <div class="card-body setting-stack">
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="operatorSpacing" checked onchange="markModified(); autoFormat()">
+                                        <label for="operatorSpacing">Space around operators</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="keepMathOperatorsTogether" checked onchange="markModified(); autoFormat()">
+                                        <label for="keepMathOperatorsTogether">Keep math ops together</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="spaceAfterComma" checked onchange="markModified(); autoFormat()">
+                                        <label for="spaceAfterComma">Space after commas</label>
+                                    </div>
+                                    <div class="setting-item inline">
+                                        <label for="commaStyle">Comma style</label>
+                                        <select id="commaStyle" onchange="markModified(); autoFormat()">
+                                            <option value="none">None</option>
+                                            <option value="space" selected>Space only</option>
+                                            <option value="break">Break only</option>
+                                            <option value="both">Space + Break</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="spaceBeforeParen" onchange="markModified(); autoFormat()">
+                                        <label for="spaceBeforeParen">Space before parenthesis</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="spaceBeforeBrace" onchange="markModified(); autoFormat()">
+                                        <label for="spaceBeforeBrace">Space before brace</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="operatorNewLine" onchange="markModified(); autoFormat()">
+                                        <label for="operatorNewLine">Operator at line start</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div class="card-title">Parameters & Calls</div>
+                                    <div class="card-subtitle">Shape how arguments sit with function names.</div>
+                                </div>
+                                <div class="card-body setting-stack">
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="paramOnSameLine" checked onchange="markModified(); autoFormat()">
+                                        <label for="paramOnSameLine">Params on same line</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="breakAfterFirstParam" onchange="markModified(); autoFormat()">
+                                        <label for="breakAfterFirstParam">Break after 1st param</label>
+                                    </div>
+                                    <div class="hint">Keep the first argument with the function name, drop the rest underneath.</div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="oneParamPerLine" onchange="markModified(); autoFormat()">
+                                        <label for="oneParamPerLine">One param per line</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="trailingComma" onchange="markModified(); autoFormat()">
+                                        <label for="trailingComma">Trailing comma on last param</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div class="card-title">Line rhythm</div>
+                                    <div class="card-subtitle">Control cadence for blocks and statements.</div>
+                                </div>
+                                <div class="card-body setting-stack">
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="openParenNewline" onchange="markModified(); autoFormat()">
+                                        <label for="openParenNewline">New line after (</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="closeParenNewline" onchange="markModified(); autoFormat()">
+                                        <label for="closeParenNewline">New line before )</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="openBraceNewline" onchange="markModified(); autoFormat()">
+                                        <label for="openBraceNewline">New line after {</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="closeBraceNewline" onchange="markModified(); autoFormat()">
+                                        <label for="closeBraceNewline">New line before }</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="semicolonNewline" checked onchange="markModified(); autoFormat()">
+                                        <label for="semicolonNewline">New line after semicolon</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="extraLinesBetweenStatements" onchange="markModified(); autoFormat()">
+                                        <label for="extraLinesBetweenStatements">Extra lines between statements</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="extraLinesAfterBraces" onchange="markModified(); autoFormat()">
+                                        <label for="extraLinesAfterBraces">Extra line after closing }</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="collapsible">
-                            <div class="collapsible-header active" onclick="toggleSection(this)">
-                                <span>SPACING & OPERATORS</span>
-                                <span class="toggle-icon">▼</span>
-                            </div>
-                            <div class="collapsible-content active">
-                                <div class="setting-item">
-                                    <input type="checkbox" id="operatorSpacing" checked onchange="markModified(); autoFormat()">
-                                    <label for="operatorSpacing">Space around operators</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="keepMathOperatorsTogether" checked onchange="markModified(); autoFormat()">
-                                    <label for="keepMathOperatorsTogether">Keep math ops together</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="spaceAfterComma" checked onchange="markModified(); autoFormat()">
-                                    <label for="spaceAfterComma">Space after commas</label>
-                                </div>
-                                <div class="setting-item">
-                                    <label for="commaStyle">Comma style</label>
-                                    <select id="commaStyle" onchange="markModified(); autoFormat()">
-                                        <option value="none">None</option>
-                                        <option value="space" selected>Space only</option>
-                                        <option value="break">Break only</option>
-                                        <option value="both">Space + Break</option>
-                                    </select>
-                                </div>
-                                <div class="hint">Customize comma formatting beyond space option</div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="spaceBeforeParen" onchange="markModified(); autoFormat()">
-                                    <label for="spaceBeforeParen">Space before parenthesis</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="spaceBeforeBrace" onchange="markModified(); autoFormat()">
-                                    <label for="spaceBeforeBrace">Space before brace</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="operatorNewLine" onchange="markModified(); autoFormat()">
-                                    <label for="operatorNewLine">Operator at line start</label>
-                                </div>
-                            </div>
+                        <div class="settings-footer">
+                            <button class="reset-btn" onclick="resetToPreset()">↻ Reset to Preset</button>
                         </div>
-
-                        <div class="collapsible">
-                            <div class="collapsible-header active" onclick="toggleSection(this)">
-                                <span>PARAMETERS (GRANULAR)</span>
-                                <span class="toggle-icon">▼</span>
-                            </div>
-                            <div class="collapsible-content active">
-                                <div class="setting-item">
-                                    <input type="checkbox" id="paramOnSameLine" checked onchange="markModified(); autoFormat()">
-                                    <label for="paramOnSameLine">Params on same line</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="breakAfterFirstParam" onchange="markModified(); autoFormat()">
-                                    <label for="breakAfterFirstParam">Break after 1st param</label>
-                                </div>
-                                <div class="hint">Keep first param with func name, rest on next line</div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="oneParamPerLine" onchange="markModified(); autoFormat()">
-                                    <label for="oneParamPerLine">One param per line</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="trailingComma" onchange="markModified(); autoFormat()">
-                                    <label for="trailingComma">Trailing comma on last param</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="collapsible">
-                            <div class="collapsible-header active" onclick="toggleSection(this)">
-                                <span>LINE BREAKS & SPACING</span>
-                                <span class="toggle-icon">▼</span>
-                            </div>
-                            <div class="collapsible-content active">
-                                <div class="setting-item">
-                                    <input type="checkbox" id="openParenNewline" onchange="markModified(); autoFormat()">
-                                    <label for="openParenNewline">New line after (</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="closeParenNewline" onchange="markModified(); autoFormat()">
-                                    <label for="closeParenNewline">New line before )</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="openBraceNewline" onchange="markModified(); autoFormat()">
-                                    <label for="openBraceNewline">New line after {</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="closeBraceNewline" onchange="markModified(); autoFormat()">
-                                    <label for="closeBraceNewline">New line before }</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="semicolonNewline" checked onchange="markModified(); autoFormat()">
-                                    <label for="semicolonNewline">New line after semicolon</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="extraLinesBetweenStatements" onchange="markModified(); autoFormat()">
-                                    <label for="extraLinesBetweenStatements">Extra lines between statements</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="extraLinesAfterBraces" onchange="markModified(); autoFormat()">
-                                    <label for="extraLinesAfterBraces">Extra line after closing }</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button class="reset-btn" onclick="resetToPreset()">↻ Reset to Preset</button>
                     </div>
 
                     <!-- FUNCTIONS TAB -->
@@ -1074,93 +1225,100 @@
                             <span>FUNCTION-SPECIFIC RULES</span>
                             <span style="font-size: 9px; color: #718096;">Auto-detected from code</span>
                         </div>
-                        <div id="funcList" class="func-list"></div>
-                        
-                        <div id="funcEditor" style="display: none;">
-                            <div class="section-header" style="margin-bottom: 12px;">
-                                <span id="selectedFuncName" style="color: #667eea; font-weight: 700;"></span>
-                                <button class="btn-small btn-clear" onclick="clearFunctionRule()">✕</button>
+                        <div class="functions-grid">
+                            <div class="settings-card">
+                                <div class="card-header">
+                                    <div class="card-title">Detected functions</div>
+                                    <div class="card-subtitle">Click a name to tailor spacing, commas, and braces.</div>
+                                </div>
+                                <div id="funcList" class="func-list"></div>
                             </div>
 
-                            <div class="collapsible">
-                                <div class="collapsible-header active" onclick="toggleSection(this)">
-                                    <span>PARAMETERS</span>
-                                    <span class="toggle-icon">▼</span>
+                            <div class="settings-card" id="funcEditor" style="display: none;">
+                                <div class="card-header" style="align-items: center;">
+                                    <span id="selectedFuncName" style="color: #667eea; font-weight: 700;"></span>
+                                    <button class="btn-small btn-clear" onclick="clearFunctionRule()">✕</button>
                                 </div>
-                                <div class="collapsible-content active">
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcParamOnSameLine" checked onchange="previewFunctionRule()">
-                                        <label for="funcParamOnSameLine">Params on same line</label>
+
+                                <div class="collapsible">
+                                    <div class="collapsible-header active" onclick="toggleSection(this)">
+                                        <span>PARAMETERS</span>
+                                        <span class="toggle-icon">▼</span>
                                     </div>
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcBreakAfterFirst" onchange="previewFunctionRule()">
-                                        <label for="funcBreakAfterFirst">Break after 1st param</label>
-                                    </div>
-                                    <div class="hint">E.g., Set(var, value) → Set(var,<br/>  value)</div>
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcOneParamPerLine" onchange="previewFunctionRule()">
-                                        <label for="funcOneParamPerLine">One param per line</label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcIndentParams" onchange="previewFunctionRule()">
-                                        <label for="funcIndentParams">Indent parameters</label>
+                                    <div class="collapsible-content active">
+                                        <div class="setting-item">
+                                            <input type="checkbox" id="funcParamOnSameLine" checked onchange="previewFunctionRule()">
+                                            <label for="funcParamOnSameLine">Params on same line</label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <input type="checkbox" id="funcBreakAfterFirst" onchange="previewFunctionRule()">
+                                            <label for="funcBreakAfterFirst">Break after 1st param</label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <input type="checkbox" id="funcOneParamPerLine" onchange="previewFunctionRule()">
+                                            <label for="funcOneParamPerLine">One param per line</label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <input type="checkbox" id="funcIndentParams" onchange="previewFunctionRule()">
+                                            <label for="funcIndentParams">Indent parameters</label>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <div class="collapsible">
+                                    <div class="collapsible-header active" onclick="toggleSection(this)">
+                                        <span>LINE BREAKS</span>
+                                        <span class="toggle-icon">▼</span>
+                                    </div>
+                                    <div class="collapsible-content active">
+                                        <div class="setting-item">
+                                            <input type="checkbox" id="funcOpenParenNewline" onchange="previewFunctionRule()">
+                                            <label for="funcOpenParenNewline">New line after (</label>
+                                        </div>
+                                        <div class="setting-item">
+                                            <input type="checkbox" id="funcCloseParenNewline" onchange="previewFunctionRule()">
+                                            <label for="funcCloseParenNewline">New line before )</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="section-header">Commas & Braces</div>
+                                <div class="setting-item">
+                                    <label for="funcCommaStyle">Comma style (override)</label>
+                                    <select id="funcCommaStyle" onchange="previewFunctionRule()">
+                                        <option value="">Use global</option>
+                                        <option value="space">Space only</option>
+                                        <option value="break">Line break only</option>
+                                        <option value="both">Space + Break</option>
+                                        <option value="none">No space/break</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="funcSpaceBeforeBrace" onchange="previewFunctionRule()">
+                                    <label for="funcSpaceBeforeBrace">Space before {</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="funcOpenBraceNewline" onchange="previewFunctionRule()">
+                                    <label for="funcOpenBraceNewline">New line after {</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="funcCloseBraceNewline" onchange="previewFunctionRule()">
+                                    <label for="funcCloseBraceNewline">New line before }</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="funcIndentBraceContent" onchange="previewFunctionRule()">
+                                    <label for="funcIndentBraceContent">Indent brace content</label>
+                                </div>
+
+                                <div class="section-header">PREVIEW</div>
+                                <div class="rule-preview" id="rulePreview"></div>
+
+                                <button class="btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveFunctionRule()">✓ Save Rule</button>
                             </div>
-
-                            <div class="collapsible">
-                                <div class="collapsible-header active" onclick="toggleSection(this)">
-                                    <span>LINE BREAKS</span>
-                                    <span class="toggle-icon">▼</span>
-                                </div>
-                                <div class="collapsible-content active">
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcOpenParenNewline" onchange="previewFunctionRule()">
-                                        <label for="funcOpenParenNewline">New line after (</label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcCloseParenNewline" onchange="previewFunctionRule()">
-                                        <label for="funcCloseParenNewline">New line before )</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="section-header">PREVIEW</div>
-                            <div class="rule-preview" id="rulePreview"></div>
-
-                            <button class="btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveFunctionRule()">✓ Save Rule</button>
                         </div>
 
                         <button class="btn-primary" style="width: 100%; margin-top: 12px; display: none;" id="addFuncBtn" onclick="createNewFunctionRule()">+ Create Custom Rule</button>
                     </div>
-
-                                    <div class="section-header">Commas & Braces</div>
-                                    <div class="setting-item">
-                                        <label for="funcCommaStyle">Comma style (override)</label>
-                                        <select id="funcCommaStyle" onchange="previewFunctionRule()">
-                                            <option value="">Use global</option>
-                                            <option value="space">Space only</option>
-                                            <option value="break">Line break only</option>
-                                            <option value="both">Space + Break</option>
-                                            <option value="none">No space/break</option>
-                                        </select>
-                                    </div>
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcSpaceBeforeBrace" onchange="previewFunctionRule()">
-                                        <label for="funcSpaceBeforeBrace">Space before {</label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcOpenBraceNewline" onchange="previewFunctionRule()">
-                                        <label for="funcOpenBraceNewline">New line after {</label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcCloseBraceNewline" onchange="previewFunctionRule()">
-                                        <label for="funcCloseBraceNewline">New line before }</label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <input type="checkbox" id="funcIndentBraceContent" onchange="previewFunctionRule()">
-                                        <label for="funcIndentBraceContent">Indent brace content</label>
-                                    </div>
                     <!-- ADVANCED TAB -->
                     <div id="advanced-tab" class="tab-content">
                         <div class="section-header first">PRESETS</div>
@@ -1436,6 +1594,7 @@
         let isModified = false;
         let resizingElement = null;
         let selectedFunction = null;
+        let liveFormattingEnabled = true;
 
         window.addEventListener('DOMContentLoaded', () => {
             loadPreferences();
@@ -1467,15 +1626,20 @@
             const theme = localStorage.getItem('powerFxTheme') || 'light';
             const layout = localStorage.getItem('powerFxLayout') || 'horizontal';
             const fontSize = localStorage.getItem('powerFxFontSize') || 'medium';
-            
+            const livePref = localStorage.getItem('powerFxLiveFormatting');
+
             if (theme === 'dark') {
                 document.body.classList.add('theme-dark');
                 document.getElementById('themeToggle').textContent = '☀️';
             }
-            
+
             userLayoutPreference = layout;
             document.getElementById('fontSize').value = fontSize;
             updateFontSize();
+
+            liveFormattingEnabled = livePref !== 'false';
+            const liveToggle = document.getElementById('liveFormatting');
+            if (liveToggle) liveToggle.checked = liveFormattingEnabled;
         }
 
         function loadFunctionRules() {
@@ -1610,7 +1774,7 @@
             });
             
             updateStatus();
-            autoFormat();
+            autoFormat(true);
         }
 
         function markModified() {
@@ -1643,7 +1807,8 @@
             return settings;
         }
 
-        function autoFormat() {
+        function autoFormat(force = false) {
+            if (!force && !liveFormattingEnabled) return;
             if (document.getElementById('input').value.trim()) {
                 formatCode();
             }
@@ -1708,6 +1873,12 @@
                 container.style.width = width;
                 showNotification(`↔️ Width: ${width}`);
             }
+        }
+
+        function toggleLiveFormatting() {
+            liveFormattingEnabled = document.getElementById('liveFormatting').checked;
+            localStorage.setItem('powerFxLiveFormatting', liveFormattingEnabled);
+            showNotification(liveFormattingEnabled ? '⚡ Live formatting on' : '✋ Live formatting paused');
         }
 
         function resetToPreset() {
@@ -2280,7 +2451,7 @@
         // Add event listeners for all settings to trigger autoFormat on change
         const settingElements = document.querySelectorAll('input[type="checkbox"], input[type="number"], select');
         settingElements.forEach(el => {
-            if (el.id && el.id !== 'input' && el.id !== 'output') {
+            if (el.id && !['input', 'output', 'liveFormatting'].includes(el.id)) {
                 el.addEventListener('change', () => {
                     markModified();
                     autoFormat();
