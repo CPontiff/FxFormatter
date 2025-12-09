@@ -1477,10 +1477,10 @@
                                     </div>
                                     <div class="setting-item">
                                         <div class="toggle-row">
-                                            <input type="checkbox" id="showLineNumbers" checked onchange="toggleLineNumbersVisibility()">
-                                            <label for="showLineNumbers">Show line numbers</label>
+                                            <input type="checkbox" id="showLineNumbers" onchange="toggleLineNumbersVisibility()" disabled>
+                                            <label for="showLineNumbers">Show line numbers (temporarily disabled)</label>
                                         </div>
-                                        <div class="hint">Hide gutters for distraction-free editing.</div>
+                                        <div class="hint">Line numbers are off for now while we refine formatting behavior.</div>
                                     </div>
                                 </div>
                             </div>
@@ -1619,6 +1619,14 @@
                                     <div class="setting-item toggle-row">
                                         <input type="checkbox" id="semicolonNewline" checked onchange="markModified(); autoFormat()">
                                         <label for="semicolonNewline">New line after semicolon</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="blockCommaNewline" checked onchange="markModified(); autoFormat()">
+                                        <label for="blockCommaNewline">New line after comma inside blocks</label>
+                                    </div>
+                                    <div class="setting-item toggle-row">
+                                        <input type="checkbox" id="blockSemicolonNewline" checked onchange="markModified(); autoFormat()">
+                                        <label for="blockSemicolonNewline">New line after semicolon inside blocks</label>
                                     </div>
                                     <div class="setting-item toggle-row">
                                         <input type="checkbox" id="extraLinesBetweenStatements" onchange="markModified(); autoFormat()">
@@ -1790,6 +1798,8 @@
                 openBraceNewline: false,
                 closeBraceNewline: false,
                 semicolonNewline: false,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: false,
                 extraLinesAfterBraces: false,
             },
@@ -1816,6 +1826,8 @@
                 openBraceNewline: false,
                 closeBraceNewline: false,
                 semicolonNewline: true,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: false,
                 extraLinesAfterBraces: false,
             },
@@ -1842,6 +1854,8 @@
                 openBraceNewline: true,
                 closeBraceNewline: true,
                 semicolonNewline: true,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: true,
                 extraLinesAfterBraces: true,
             },
@@ -1868,6 +1882,8 @@
                 openBraceNewline: true,
                 closeBraceNewline: true,
                 semicolonNewline: true,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: true,
                 extraLinesAfterBraces: true,
             },
@@ -1894,6 +1910,8 @@
                 openBraceNewline: true,
                 closeBraceNewline: true,
                 semicolonNewline: true,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: true,
                 extraLinesAfterBraces: false,
             },
@@ -1920,6 +1938,8 @@
                 openBraceNewline: true,
                 closeBraceNewline: false,
                 semicolonNewline: true,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: false,
                 extraLinesAfterBraces: false,
             },
@@ -1946,6 +1966,8 @@
                 openBraceNewline: true,
                 closeBraceNewline: true,
                 semicolonNewline: true,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: true,
                 extraLinesAfterBraces: true,
             },
@@ -1972,6 +1994,8 @@
                 openBraceNewline: true,
                 closeBraceNewline: true,
                 semicolonNewline: true,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: true,
                 extraLinesAfterBraces: true,
             },
@@ -1998,6 +2022,8 @@
                 openBraceNewline: false,
                 closeBraceNewline: false,
                 semicolonNewline: false,
+                blockCommaNewline: true,
+                blockSemicolonNewline: true,
                 extraLinesBetweenStatements: false,
                 extraLinesAfterBraces: false,
             }
@@ -2013,7 +2039,7 @@
         let resizingElement = null;
         let selectedFunction = null;
         let liveFormattingEnabled = true;
-        let lineNumbersVisible = true;
+        let lineNumbersVisible = false;
         const CARD_ORDER_KEY = 'powerFxCardOrder';
         let draggingCard = null;
         const lineMeasureElements = {};
@@ -2054,7 +2080,6 @@
             const fontSize = localStorage.getItem('powerFxFontSize') || 'medium';
             const livePref = localStorage.getItem('powerFxLiveFormatting');
             const inputCollapsed = localStorage.getItem('powerFxInputCollapsed') === 'true';
-            const showLineNumbersPref = localStorage.getItem('powerFxShowLineNumbers');
 
             if (theme === 'dark') {
                 document.body.classList.add('theme-dark');
@@ -2075,9 +2100,12 @@
             const liveToggle = document.getElementById('liveFormatting');
             if (liveToggle) liveToggle.checked = liveFormattingEnabled;
 
-            lineNumbersVisible = showLineNumbersPref !== 'false';
+            lineNumbersVisible = false;
             const lineNumberToggle = document.getElementById('showLineNumbers');
-            if (lineNumberToggle) lineNumberToggle.checked = lineNumbersVisible;
+            if (lineNumberToggle) {
+                lineNumberToggle.checked = false;
+            }
+            localStorage.setItem('powerFxShowLineNumbers', 'false');
             applyLineNumberVisibility();
         }
 
@@ -2112,7 +2140,7 @@
                 'spaceInsideParentheses', 'spaceAfterComma', 'commaStyle',
                 'breakAfterOperators', 'oneParamPerLine', 'breakAfterFirstParam',
                 'paramOnSameLine', 'breakAroundKeywords', 'keywords',
-                'semiColonAtEnd', 'semicolonNewline', 'extraLinesBetweenStatements',
+                'semiColonAtEnd', 'semicolonNewline', 'blockCommaNewline', 'blockSemicolonNewline', 'extraLinesBetweenStatements',
                 'extraLinesAfterBraces'
             ];
             
@@ -2229,7 +2257,7 @@
 
         function getSettings() {
             const settings = {};
-            const settingIds = ['indentSize', 'indentParams', 'indentAfterComma', 'indentBraceContent', 'operatorSpacing', 'keepMathOperatorsTogether', 'spaceAfterComma', 'commaStyle', 'spaceBeforeParen', 'spaceBeforeBrace', 'operatorNewLine', 'paramOnSameLine', 'breakAfterFirstParam', 'oneParamPerLine', 'trailingComma', 'openParenNewline', 'closeParenNewline', 'openBraceNewline', 'closeBraceNewline', 'semicolonNewline', 'extraLinesBetweenStatements', 'extraLinesAfterBraces'];
+            const settingIds = ['indentSize', 'indentParams', 'indentAfterComma', 'indentBraceContent', 'operatorSpacing', 'keepMathOperatorsTogether', 'spaceAfterComma', 'commaStyle', 'spaceBeforeParen', 'spaceBeforeBrace', 'operatorNewLine', 'paramOnSameLine', 'breakAfterFirstParam', 'oneParamPerLine', 'trailingComma', 'openParenNewline', 'closeParenNewline', 'openBraceNewline', 'closeBraceNewline', 'semicolonNewline', 'blockCommaNewline', 'blockSemicolonNewline', 'extraLinesBetweenStatements', 'extraLinesAfterBraces'];
             
             settingIds.forEach(id => {
                 const el = document.getElementById(id);
@@ -2393,7 +2421,15 @@
         }
 
         function toggleLineNumbersVisibility() {
-            lineNumbersVisible = document.getElementById('showLineNumbers').checked;
+            const toggle = document.getElementById('showLineNumbers');
+            if (!toggle || toggle.disabled) {
+                lineNumbersVisible = false;
+                applyLineNumberVisibility();
+                localStorage.setItem('powerFxShowLineNumbers', 'false');
+                showNotification('👁️‍🗨️ Line numbers are temporarily disabled');
+                return;
+            }
+            lineNumbersVisible = toggle.checked;
             localStorage.setItem('powerFxShowLineNumbers', lineNumbersVisible);
             applyLineNumberVisibility();
             showNotification(lineNumbersVisible ? '🔢 Line numbers shown' : '👁️‍🗨️ Line numbers hidden');
@@ -2936,6 +2972,8 @@
             let lastWasSemicolon = false;
             let currentFunction = '';
             let paramCount = 0;
+            let braceDepth = 0;
+            let parenDepth = 0;
             
             const indent = () => ' '.repeat(depth * settings.indentSize);
             const mathOps = ['+', '-', '*', '/'];
@@ -3028,6 +3066,7 @@
                 if (char === '(') {
                     const rule = functionRules[currentFunction];
                     paramCount = 0;
+                    parenDepth++;
                     
                     if (settings.spaceBeforeParen && result.slice(-1) !== ' ' && result.trim()) {
                         addLine(' ');
@@ -3047,6 +3086,8 @@
                 
                 if (char === ')') {
                     const rule = functionRules[currentFunction];
+
+                    parenDepth = Math.max(0, parenDepth - 1);
                     
                     if ((rule?.indentParams || settings.indentParams) && (rule?.oneParamPerLine || settings.oneParamPerLine)) {
                         depth--;
@@ -3077,10 +3118,11 @@
                     if (indentBraceContent) {
                         depth++;
                     }
+                    braceDepth++;
                     i++;
                     continue;
                 }
-                
+
                 if (char === '}') {
                     const rule = functionRules[currentFunction];
                     const indentBraceContent = rule?.indentBraceContent ?? settings.indentBraceContent;
@@ -3089,6 +3131,7 @@
                     if (indentBraceContent) {
                         depth--;
                     }
+                    braceDepth = Math.max(0, braceDepth - 1);
                     if (closeBraceNewline && !lastWasNewline) {
                         newLine();
                     }
@@ -3104,14 +3147,18 @@
                     const rule = functionRules[currentFunction];
                     paramCount++;
                     addLine(char);
-                    
+
                     const style = (rule?.commaStyle && rule.commaStyle !== '') ? rule.commaStyle : (settings.commaStyle || 'space');
                     const hasSpace = style === 'space' || style === 'both';
                     const hasBreak = style === 'break' || style === 'both';
-                    
+                    const insideBlock = braceDepth > 0 || parenDepth > 0;
+                    const blockBreak = settings.blockCommaNewline && insideBlock;
+
                     if (rule?.oneParamPerLine || settings.oneParamPerLine) {
                         newLine();
                     } else if (rule?.breakAfterFirstParam && paramCount === 1) {
+                        newLine();
+                    } else if (blockBreak) {
                         newLine();
                     } else if ((rule?.paramOnSameLine !== false) || settings.paramOnSameLine) {
                         if (hasSpace) addLine(' ');
@@ -3126,11 +3173,14 @@
                 if (char === ';') {
                     addLine(char);
                     lastWasSemicolon = true;
+                    const insideBlock = braceDepth > 0 || parenDepth > 0;
                     if (settings.semicolonNewline) {
                         newLine();
                         if (settings.extraLinesBetweenStatements && depth === 0) newLine();
                     } else {
-                        if (settings.spaceAfterComma) addLine(' ');
+                        if (settings.blockSemicolonNewline && insideBlock) {
+                            newLine();
+                        } else if (settings.spaceAfterComma) addLine(' ');
                     }
                     currentFunction = '';
                     i++;
