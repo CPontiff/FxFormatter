@@ -397,6 +397,13 @@
         .resizer.active {
             background: #667eea;
         }
+        .container.input-collapsed .left-panel,
+        .container.input-collapsed .resizer {
+            display: none;
+        }
+        .container.input-collapsed .right-panel {
+            flex: 1 0 100%;
+        }
         .panel-header {
             display: flex;
             justify-content: space-between;
@@ -411,6 +418,11 @@
         }
         .theme-dark .panel-title {
             color: #e2e8f0;
+        }
+        .panel-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
         }
         textarea {
             width: 100%;
@@ -427,6 +439,8 @@
             color: #2d3748;
             min-height: 0;
             spellcheck: false;
+            white-space: pre;
+            overflow: auto;
         }
         .theme-dark textarea {
             background: #2d3748;
@@ -448,6 +462,34 @@
         }
         textarea.font-xlarge {
             font-size: 17px;
+        }
+        .editor-wrapper {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+            flex: 1;
+            min-height: 0;
+        }
+        .line-gutter {
+            width: 48px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f7fafc;
+            color: #718096;
+            font-size: 11px;
+            padding: 10px 6px;
+            text-align: right;
+            overflow: hidden;
+            user-select: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        .line-gutter .line-number {
+            line-height: 1.5;
+        }
+        .theme-dark .line-gutter {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: #a0aec0;
         }
         .button-group {
             display: flex;
@@ -654,10 +696,17 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
+            position: relative;
         }
         .theme-dark .settings-card {
             background: #1f2737;
             border-color: #4a5568;
+        }
+        .settings-card.collapsed .card-body {
+            display: none;
+        }
+        .settings-card.collapsed .card-subtitle {
+            display: none;
         }
         .card-header {
             display: flex;
@@ -677,6 +726,69 @@
             line-height: 1.4;
         }
         .theme-dark .card-subtitle { color: #a0aec0; }
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .card-toggle {
+            background: #edf2f7;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            padding: 4px 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .theme-dark .card-toggle {
+            background: #3a4a5a;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        .drag-handle {
+            cursor: grab;
+            font-size: 14px;
+            color: #a0aec0;
+            user-select: none;
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .help-tip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #edf2f7;
+            color: #4a5568;
+            font-size: 12px;
+            cursor: default;
+        }
+        .theme-dark .help-tip { background: #3a4a5a; color: #e2e8f0; }
+        .help-card {
+            position: absolute;
+            top: 26px;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 10px;
+            width: 260px;
+            font-size: 11px;
+            line-height: 1.5;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 5;
+        }
+        .theme-dark .help-card { background: #1a202c; border-color: #4a5568; color: #e2e8f0; }
+        .help-tip:hover .help-card {
+            opacity: 1;
+            pointer-events: auto;
+        }
         .card-body {
             display: flex;
             flex-direction: column;
@@ -1148,9 +1260,26 @@
                 <div class="subtitle">Professional formatting styles for Power Apps</div>
             </div>
             <div class="header-controls">
+                <button class="icon-btn" id="inputToggle" onclick="toggleInputPanel()" title="Toggle input panel">👁️</button>
                 <button class="icon-btn" id="themeToggle" onclick="toggleTheme()">🌙</button>
                 <button class="icon-btn" id="layoutToggle" onclick="toggleLayout()">↔️</button>
                 <button class="icon-btn settings-toggle-btn" id="settingsToggleHeader" onclick="toggleSettingsPanel()">⚙️</button>
+                <div class="help-tip" aria-label="Help tips">
+                    ❔
+                    <div class="help-card">
+                        <strong>Workspace help</strong>
+                        <ul style="margin-left: 14px; margin-top: 6px; line-height: 1.4;">
+                            <li>Hover the line gutter to see indexes and keep wrapped lines clear.</li>
+                            <li>Use the 👁️ button to collapse the input window when you need maximum output space.</li>
+                            <li>Drag the ☰ handle on any settings card to reorder your workflow, or collapse cards you rarely touch.</li>
+                        </ul>
+                        <div style="margin-top: 6px; color: #48bb78; font-weight: 600;">Examples</div>
+                        <div style="font-size: 10px; color: #4a5568; margin-top: 4px;">
+                            <div>• One-parameter-per-line: toggles in Parameters & Calls.</div>
+                            <div>• Brace spacing: Line rhythm → Space before brace.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -1191,11 +1320,22 @@
         
         <div class="main-content" id="mainContent">
             <div class="editor-section">
-                <div class="panel left-panel">
+                <div class="panel left-panel" id="inputPanel">
                     <div class="panel-header">
                         <span class="panel-title">📝 Input</span>
+                        <div class="panel-actions">
+                            <div class="help-tip" aria-label="Input help">
+                                ❔
+                                <div class="help-card">
+                                    Keep line numbers visible to avoid mixing wrapped text with true newlines. Use Ctrl + Enter to format fast.
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <textarea id="input" placeholder="Paste your PowerFX code here..." spellcheck="false"></textarea>
+                    <div class="editor-wrapper">
+                        <div class="line-gutter" id="inputLines" aria-hidden="true"></div>
+                        <textarea id="input" placeholder="Paste your PowerFX code here..." spellcheck="false" wrap="off"></textarea>
+                    </div>
                     <div class="button-group">
                         <button class="btn-primary" onclick="formatCode()">🔄 Format</button>
                         <button class="btn-clear" onclick="clearInput()">✖</button>
@@ -1208,8 +1348,19 @@
                 <div class="panel right-panel">
                     <div class="panel-header">
                         <span class="panel-title">✨ Output</span>
+                        <div class="panel-actions">
+                            <div class="help-tip" aria-label="Output help">
+                                ❔
+                                <div class="help-card">
+                                    Line numbers stay locked to the formatted text so you can compare against input quickly. Collapse the input panel if you want a wide preview.
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <textarea id="output" placeholder="Formatted code will appear here..." readonly spellcheck="false"></textarea>
+                    <div class="editor-wrapper">
+                        <div class="line-gutter" id="outputLines" aria-hidden="true"></div>
+                        <textarea id="output" placeholder="Formatted code will appear here..." readonly spellcheck="false" wrap="off"></textarea>
+                    </div>
                     <div class="button-group">
                         <button class="btn-secondary" onclick="copyToClipboard()">📋 Copy</button>
                         <button class="btn-tertiary" onclick="copyOutputToInput()">↩️ To Input</button>
@@ -1277,11 +1428,15 @@
                         </div>
 
                         <div class="settings-grid">
-                            <div class="settings-card">
+                            <div class="settings-card" data-card-key="workflow-display">
                                 <div class="card-header">
                                     <div>
                                         <div class="card-title">Workflow & Display</div>
                                         <div class="card-subtitle">Keep the workspace readable while you iterate.</div>
+                                    </div>
+                                    <div class="card-actions">
+                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse workflow card">▾</button>
+                                        <span class="drag-handle" title="Drag to reorder">☰</span>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -1313,10 +1468,14 @@
                                 </div>
                             </div>
 
-                            <div class="settings-card">
+                            <div class="settings-card" data-card-key="indentation">
                                 <div class="card-header">
                                     <div class="card-title">Indentation</div>
                                     <div class="card-subtitle">Control depth and brace behavior.</div>
+                                    <div class="card-actions">
+                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse indentation card">▾</button>
+                                        <span class="drag-handle" title="Drag to reorder">☰</span>
+                                    </div>
                                 </div>
                                 <div class="card-body setting-stack">
                                     <div class="setting-item inline">
@@ -1338,10 +1497,14 @@
                                 </div>
                             </div>
 
-                            <div class="settings-card">
+                            <div class="settings-card" data-card-key="spacing">
                                 <div class="card-header">
                                     <div class="card-title">Spacing & Operators</div>
                                     <div class="card-subtitle">Make logic readable without adding clutter.</div>
+                                    <div class="card-actions">
+                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse spacing card">▾</button>
+                                        <span class="drag-handle" title="Drag to reorder">☰</span>
+                                    </div>
                                 </div>
                                 <div class="card-body setting-stack">
                                     <div class="setting-item toggle-row">
@@ -1380,10 +1543,14 @@
                                 </div>
                             </div>
 
-                            <div class="settings-card">
+                            <div class="settings-card" data-card-key="parameters">
                                 <div class="card-header">
                                     <div class="card-title">Parameters & Calls</div>
                                     <div class="card-subtitle">Shape how arguments sit with function names.</div>
+                                    <div class="card-actions">
+                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse parameters card">▾</button>
+                                        <span class="drag-handle" title="Drag to reorder">☰</span>
+                                    </div>
                                 </div>
                                 <div class="card-body setting-stack">
                                     <div class="setting-item toggle-row">
@@ -1406,10 +1573,14 @@
                                 </div>
                             </div>
 
-                            <div class="settings-card">
+                            <div class="settings-card" data-card-key="line-rhythm">
                                 <div class="card-header">
                                     <div class="card-title">Line rhythm</div>
                                     <div class="card-subtitle">Control cadence for blocks and statements.</div>
+                                    <div class="card-actions">
+                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse line rhythm card">▾</button>
+                                        <span class="drag-handle" title="Drag to reorder">☰</span>
+                                    </div>
                                 </div>
                                 <div class="card-body setting-stack">
                                     <div class="setting-item toggle-row">
@@ -1825,6 +1996,8 @@
         let resizingElement = null;
         let selectedFunction = null;
         let liveFormattingEnabled = true;
+        const CARD_ORDER_KEY = 'powerFxCardOrder';
+        let draggingCard = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             loadPreferences();
@@ -1833,6 +2006,9 @@
             updateLayoutDisplay();
             loadFunctionRules();
             updateStatus();
+            initializeCardControls();
+            setupLineNumberListeners();
+            refreshAllLineNumbers();
         });
 
         window.addEventListener('resize', () => {
@@ -1857,6 +2033,7 @@
             const layout = localStorage.getItem('powerFxLayout') || 'horizontal';
             const fontSize = localStorage.getItem('powerFxFontSize') || 'medium';
             const livePref = localStorage.getItem('powerFxLiveFormatting');
+            const inputCollapsed = localStorage.getItem('powerFxInputCollapsed') === 'true';
 
             if (theme === 'dark') {
                 document.body.classList.add('theme-dark');
@@ -1866,6 +2043,12 @@
             userLayoutPreference = layout;
             document.getElementById('fontSize').value = fontSize;
             updateFontSize();
+
+            if (inputCollapsed) {
+                document.querySelector('.container').classList.add('input-collapsed');
+                const toggleBtn = document.getElementById('inputToggle');
+                if (toggleBtn) toggleBtn.textContent = '🪟';
+            }
 
             liveFormattingEnabled = livePref !== 'false';
             const liveToggle = document.getElementById('liveFormatting');
@@ -2056,6 +2239,14 @@
             updateLayoutDisplay();
         }
 
+        function toggleInputPanel() {
+            const container = document.querySelector('.container');
+            const toggleBtn = document.getElementById('inputToggle');
+            const collapsed = container.classList.toggle('input-collapsed');
+            toggleBtn.textContent = collapsed ? '🪟' : '👁️';
+            localStorage.setItem('powerFxInputCollapsed', collapsed ? 'true' : 'false');
+        }
+
         function updateLayoutDisplay() {
             const mainContent = document.getElementById('mainContent');
             const layoutBtn = document.getElementById('layoutToggle');
@@ -2079,10 +2270,71 @@
             const panel = document.getElementById('settingsPanel');
             const btn = document.getElementById('collapseBtn');
             const container = document.querySelector('.container');
-            
+
             const isCollapsed = panel.classList.toggle('collapsed');
             btn.classList.toggle('collapsed', isCollapsed);
             container.classList.toggle('settings-collapsed', isCollapsed);
+        }
+
+        function toggleCard(btn) {
+            const card = btn.closest('.settings-card');
+            if (!card) return;
+            const collapsed = card.classList.toggle('collapsed');
+            btn.textContent = collapsed ? '▶' : '▾';
+            saveCardOrder();
+        }
+
+        function initializeCardControls() {
+            applySavedCardOrder();
+            const cards = document.querySelectorAll('.settings-grid .settings-card');
+            cards.forEach(card => {
+                card.setAttribute('draggable', true);
+                card.addEventListener('dragstart', (e) => {
+                    if (!e.target.closest('.drag-handle')) {
+                        e.preventDefault();
+                        return;
+                    }
+                    draggingCard = card;
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                card.addEventListener('dragover', (e) => {
+                    if (!draggingCard || draggingCard === card) return;
+                    e.preventDefault();
+                    const grid = card.parentElement;
+                    const cardsArr = Array.from(grid.querySelectorAll('.settings-card'));
+                    const targetIndex = cardsArr.indexOf(card);
+                    const dragIndex = cardsArr.indexOf(draggingCard);
+                    if (targetIndex > dragIndex) {
+                        grid.insertBefore(draggingCard, card.nextSibling);
+                    } else {
+                        grid.insertBefore(draggingCard, card);
+                    }
+                });
+                card.addEventListener('dragend', () => {
+                    if (!draggingCard) return;
+                    draggingCard = null;
+                    saveCardOrder();
+                });
+            });
+            saveCardOrder();
+        }
+
+        function saveCardOrder() {
+            const cards = Array.from(document.querySelectorAll('.settings-grid .settings-card'));
+            const order = cards.map(card => card.dataset.cardKey || '');
+            localStorage.setItem(CARD_ORDER_KEY, JSON.stringify(order));
+        }
+
+        function applySavedCardOrder() {
+            const saved = localStorage.getItem(CARD_ORDER_KEY);
+            if (!saved) return;
+            const order = JSON.parse(saved);
+            const grid = document.querySelector('.settings-grid');
+            if (!grid || !Array.isArray(order)) return;
+            order.forEach(key => {
+                const card = grid.querySelector(`.settings-card[data-card-key="${key}"]`);
+                if (card) grid.appendChild(card);
+            });
         }
 
         function updateFontSize() {
@@ -2244,6 +2496,7 @@
             if (snippet) {
                 document.getElementById('input').value = snippet;
                 updateDiagnostics();
+                refreshAllLineNumbers();
                 autoFormat(true);
                 showNotification('✨ Snippet inserted');
             }
@@ -2260,6 +2513,7 @@
                 reader.onload = () => {
                     document.getElementById('input').value = reader.result;
                     updateDiagnostics();
+                    refreshAllLineNumbers();
                     autoFormat(true);
                     showNotification(`📂 Loaded ${file.name}`);
                 };
@@ -2292,6 +2546,7 @@
             detectedFunctions.clear();
             updateFunctionList();
             updateDiagnostics();
+            refreshAllLineNumbers();
             showNotification('♻️ Workspace reset');
         }
 
@@ -2481,6 +2736,39 @@
             setTimeout(() => notif.classList.remove('show'), 2000);
         }
 
+        function updateLineNumbers(areaId, gutterId) {
+            const textarea = document.getElementById(areaId);
+            const gutter = document.getElementById(gutterId);
+            if (!textarea || !gutter) return;
+            const lines = textarea.value.split('\n').length || 1;
+            const html = Array.from({ length: lines }, (_, i) => `<div class="line-number">${i + 1}</div>`).join('');
+            gutter.innerHTML = html;
+            gutter.scrollTop = textarea.scrollTop;
+        }
+
+        function syncLineScroll(areaId, gutterId) {
+            const textarea = document.getElementById(areaId);
+            const gutter = document.getElementById(gutterId);
+            if (textarea && gutter) {
+                gutter.scrollTop = textarea.scrollTop;
+            }
+        }
+
+        function setupLineNumberListeners() {
+            ['input', 'output'].forEach(id => {
+                const gutterId = `${id}Lines`;
+                const textarea = document.getElementById(id);
+                if (!textarea) return;
+                textarea.addEventListener('input', () => updateLineNumbers(id, gutterId));
+                textarea.addEventListener('scroll', () => syncLineScroll(id, gutterId));
+            });
+        }
+
+        function refreshAllLineNumbers() {
+            updateLineNumbers('input', 'inputLines');
+            updateLineNumbers('output', 'outputLines');
+        }
+
         const resizer = document.getElementById('resizer');
         let isResizing = false;
 
@@ -2543,6 +2831,7 @@
             document.getElementById('output').value = formatted;
             updateFunctionList();
             updateDiagnostics();
+            refreshAllLineNumbers();
         }
 
         function formatPowerFX(code, settings) {
@@ -2815,6 +3104,7 @@
                 const text = await navigator.clipboard.readText();
                 document.getElementById('input').value = text;
                 updateDiagnostics();
+                refreshAllLineNumbers();
                 showNotification('✓ Pasted');
             } catch (err) {
                 showNotification('⚠️ Paste denied. Use Ctrl+V');
@@ -2828,16 +3118,19 @@
                 return;
             }
             document.getElementById('input').value = output;
+            refreshAllLineNumbers();
             showNotification('✓ Copied to input');
         }
 
         function clearInput() {
             document.getElementById('input').value = '';
             updateDiagnostics();
+            refreshAllLineNumbers();
         }
 
         function clearOutput() {
             document.getElementById('output').value = '';
+            refreshAllLineNumbers();
         }
 
         // Add event listeners for all settings to trigger autoFormat on change
