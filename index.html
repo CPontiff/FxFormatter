@@ -95,6 +95,105 @@
             flex-shrink: 0;
             overflow-x: auto;
         }
+        .workflow-bar {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 12px;
+            padding: 12px 20px;
+            background: #edf2f7;
+            border-bottom: 2px solid #e2e8f0;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .theme-dark .workflow-bar {
+            background: #2d3748;
+            border-bottom-color: #4a5568;
+        }
+        .workflow-steps {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .workflow-step {
+            background: white;
+            color: #2d3748;
+            border: 1px solid #cbd5e0;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+        .theme-dark .workflow-step {
+            background: #1a202c;
+            border-color: #4a5568;
+            color: #e2e8f0;
+        }
+        .workflow-step.active {
+            border-color: #48bb78;
+            color: #2f855a;
+        }
+        .theme-dark .workflow-step.active {
+            color: #68d391;
+        }
+        .workflow-stats {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+        .chip {
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: white;
+            border: 1px solid #cbd5e0;
+            font-size: 11px;
+            color: #2d3748;
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+            font-weight: 600;
+        }
+        .chip.success {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+        .chip.alert {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+        }
+        .chip.muted {
+            background: #f7fafc;
+            color: #4a5568;
+        }
+        .theme-dark .chip {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-color: #4a5568;
+        }
+        .theme-dark .chip.muted { background: #2d3748; }
+        .workflow-actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .workflow-actions button {
+            flex: 1 1 120px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+            background: #4a5568;
+            color: white;
+        }
+        .workflow-actions button:hover { background: #2d3748; }
+        .theme-dark .workflow-actions button { background: #667eea; }
+        .theme-dark .workflow-actions button:hover { background: #5568d3; }
         .theme-dark .styles-bar {
             background: #2d3748;
             border-bottom-color: #4a5568;
@@ -916,6 +1015,89 @@
             margin-top: 4px;
             font-style: italic;
         }
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .insight-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .theme-dark .insight-card {
+            background: #1a202c;
+            border-color: #4a5568;
+        }
+        .insight-title {
+            font-weight: 700;
+            font-size: 12px;
+            color: #2d3748;
+        }
+        .theme-dark .insight-title { color: #e2e8f0; }
+        .insight-body {
+            font-size: 11px;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+        .theme-dark .insight-body { color: #cbd5e0; }
+        .warning-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .warning-item {
+            background: #fff5f5;
+            color: #c53030;
+            border: 1px solid #fed7d7;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .theme-dark .warning-item {
+            background: #742a2a;
+            color: #fed7d7;
+            border-color: #feb2b2;
+        }
+        .warning-item.ok {
+            background: #f0fff4;
+            color: #2f855a;
+            border-color: #c6f6d5;
+        }
+        .theme-dark .warning-item.ok {
+            background: #22543d;
+            color: #c6f6d5;
+            border-color: #68d391;
+        }
+        .snippet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+        }
+        .snippet-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.2s;
+        }
+        .snippet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.25);
+        }
+        .theme-dark .snippet-btn { background: #5568d3; }
 
         @media (max-width: 1200px) {
             .main-content {
@@ -987,6 +1169,25 @@
             </div>
             <button class="save-default-btn" onclick="saveAsDefault()">💾 Save</button>
         </div>
+
+        <div class="workflow-bar">
+            <div class="workflow-steps">
+                <div class="workflow-step active">1️⃣ Paste / Type</div>
+                <div class="workflow-step">2️⃣ Tune settings</div>
+                <div class="workflow-step">3️⃣ Export</div>
+            </div>
+            <div class="workflow-stats">
+                <span class="chip" id="lineCountChip">0 lines</span>
+                <span class="chip" id="charCountChip">0 chars</span>
+                <span class="chip muted" id="functionChip">0 functions</span>
+                <span class="chip success" id="diagnosticChip">All clear</span>
+            </div>
+            <div class="workflow-actions">
+                <button onclick="importCodeFile()">⬆️ Import code</button>
+                <button onclick="downloadOutput()">⬇️ Download output</button>
+                <button onclick="resetWorkspace()">♻️ Reset workspace</button>
+            </div>
+        </div>
         
         <div class="main-content" id="mainContent">
             <div class="editor-section">
@@ -1044,6 +1245,35 @@
                                 </div>
                             </div>
                             <div class="style-description" id="styleDescription"></div>
+                        </div>
+
+                        <div class="insights-grid">
+                            <div class="insight-card">
+                                <div class="insight-title">Formatter health</div>
+                                <div class="warning-list" id="warningList">
+                                    <div class="warning-item ok">✅ Paste code to see structural checks.</div>
+                                </div>
+                            </div>
+                            <div class="insight-card">
+                                <div class="insight-title">Starter snippets</div>
+                                <div class="insight-body">Insert common patterns to test spacing, wrapping, and indentation.</div>
+                                <div class="snippet-grid">
+                                    <button class="snippet-btn" onclick="insertSnippet('if')">IF + Patch flow</button>
+                                    <button class="snippet-btn" onclick="insertSnippet('with')">With + LookUp combo</button>
+                                    <button class="snippet-btn" onclick="insertSnippet('collection')">Collect + ForAll</button>
+                                    <button class="snippet-btn" onclick="insertSnippet('toggle')">Toggle with Switch</button>
+                                </div>
+                            </div>
+                            <div class="insight-card">
+                                <div class="insight-title">Workflow tips</div>
+                                <div class="insight-body">
+                                    <ul style="margin-left: 16px; line-height: 1.5;">
+                                        <li>Use <strong>Ctrl + Enter</strong> to format instantly.</li>
+                                        <li>Apply presets, then tweak individual rules—chips above keep you honest.</li>
+                                        <li>Export your formatted output to share a one-file solution with teammates.</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="settings-grid">
@@ -1905,6 +2135,164 @@
             document.getElementById('statusStyle').textContent = STYLE_PRESETS[currentStyle].name;
             document.getElementById('statusModified').textContent = isModified ? '✓ Custom' : 'No';
             document.getElementById('statusFuncRules').textContent = Object.keys(functionRules).length;
+            updateDiagnostics();
+        }
+
+        function analyzeCodeHealth(code) {
+            const lines = code.split(/\r?\n/);
+            let paren = 0, brace = 0;
+            let inString = false;
+            let stringChar = '';
+            let trailingSpaces = 0;
+
+            lines.forEach(line => {
+                if (/\s+$/.test(line)) trailingSpaces++;
+            });
+
+            for (let i = 0; i < code.length; i++) {
+                const char = code[i];
+                const prev = code[i - 1];
+                if ((char === '"' || char === "'") && (!inString || stringChar === char) && prev !== '\\') {
+                    inString = !inString;
+                    stringChar = char;
+                    continue;
+                }
+                if (inString) continue;
+                if (char === '(') paren++;
+                if (char === ')') paren--;
+                if (char === '{') brace++;
+                if (char === '}') brace--;
+            }
+
+            const warnings = [];
+            if (paren > 0) warnings.push(`Missing ${paren} closing parenthesis`);
+            if (paren < 0) warnings.push(`Remove ${Math.abs(paren)} stray closing parenthesis`);
+            if (brace > 0) warnings.push(`Missing ${brace} closing brace`);
+            if (brace < 0) warnings.push(`Remove ${Math.abs(brace)} stray closing brace`);
+            if (inString) warnings.push('Unclosed string literal');
+            if (trailingSpaces > 0) warnings.push(`${trailingSpaces} line(s) with trailing whitespace`);
+
+            return {
+                lineCount: lines.filter(line => line !== '').length,
+                totalLines: lines.length,
+                charCount: code.length,
+                warnings,
+                trailingSpaces
+            };
+        }
+
+        function updateDiagnostics() {
+            const input = document.getElementById('input').value;
+            const stats = analyzeCodeHealth(input);
+
+            document.getElementById('lineCountChip').textContent = `${stats.totalLines} line${stats.totalLines === 1 ? '' : 's'}`;
+            document.getElementById('charCountChip').textContent = `${stats.charCount} char${stats.charCount === 1 ? '' : 's'}`;
+            document.getElementById('functionChip').textContent = `${detectedFunctions.size} function${detectedFunctions.size === 1 ? '' : 's'}`;
+
+            const diagnosticChip = document.getElementById('diagnosticChip');
+            diagnosticChip.classList.remove('alert', 'success', 'muted');
+
+            const warningList = document.getElementById('warningList');
+            if (!input.trim()) {
+                diagnosticChip.textContent = 'Waiting for input';
+                diagnosticChip.classList.add('muted');
+                warningList.innerHTML = '<div class="warning-item ok">Start typing to see live checks.</div>';
+                return;
+            }
+
+            if (stats.warnings.length === 0) {
+                diagnosticChip.textContent = 'All clear';
+                diagnosticChip.classList.add('success');
+                warningList.innerHTML = '<div class="warning-item ok">✅ No structural warnings detected.</div>';
+            } else {
+                diagnosticChip.textContent = `${stats.warnings.length} warning${stats.warnings.length === 1 ? '' : 's'}`;
+                diagnosticChip.classList.add('alert');
+                warningList.innerHTML = stats.warnings.map(item => `<div class="warning-item">⚠️ ${item}</div>`).join('');
+            }
+        }
+
+        function insertSnippet(key) {
+            const snippets = {
+                'if': `If(
+    User().Email = "maker@contoso.com",
+    Patch(Accounts, Defaults(Accounts), { Name: "Premium" }),
+    Notify("No access", NotificationType.Error)
+);`,
+                'with': `With(
+    { activeRecord: LookUp(Accounts, Name = "'Alpine'") },
+    If(
+        !IsBlank(activeRecord),
+        Patch(Accounts, activeRecord, { Status: "Active" }),
+        Notify("Missing account", NotificationType.Warning)
+    )
+);`,
+                'collection': `ClearCollect(
+    colOrders,
+    ForAll(
+        Orders,
+        { Id: ThisRecord.Id, Total: Sum(LineItems, Quantity * Price) }
+    )
+);`,
+                'toggle': `Switch(
+    true,
+    Toggle1.Value, Set(mode, "Edit"),
+    Dropdown1.Selected.Value = "New", Set(mode, "Create"),
+    Set(mode, "Read")
+);`
+            };
+            const snippet = snippets[key];
+            if (snippet) {
+                document.getElementById('input').value = snippet;
+                updateDiagnostics();
+                autoFormat(true);
+                showNotification('✨ Snippet inserted');
+            }
+        }
+
+        function importCodeFile() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.fx,.txt,.json,.yaml,.yml,.md,.ps1,.js,.ts,.cs,.sql,.txt';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    document.getElementById('input').value = reader.result;
+                    updateDiagnostics();
+                    autoFormat(true);
+                    showNotification(`📂 Loaded ${file.name}`);
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function downloadOutput() {
+            const output = document.getElementById('output').value;
+            if (!output.trim()) {
+                showNotification('⚠️ Nothing to download');
+                return;
+            }
+            const blob = new Blob([output], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'formatted.fx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('⬇️ Downloaded formatted file');
+        }
+
+        function resetWorkspace() {
+            clearInput();
+            clearOutput();
+            detectedFunctions.clear();
+            updateFunctionList();
+            updateDiagnostics();
+            showNotification('♻️ Workspace reset');
         }
 
         function updateFunctionList() {
@@ -2146,13 +2534,15 @@
                 document.getElementById('output').value = '';
                 detectedFunctions.clear();
                 updateFunctionList();
+                updateDiagnostics();
                 return;
             }
-            
+
             const settings = getSettings();
             const formatted = formatPowerFX(input, settings);
             document.getElementById('output').value = formatted;
             updateFunctionList();
+            updateDiagnostics();
         }
 
         function formatPowerFX(code, settings) {
@@ -2424,6 +2814,7 @@
             try {
                 const text = await navigator.clipboard.readText();
                 document.getElementById('input').value = text;
+                updateDiagnostics();
                 showNotification('✓ Pasted');
             } catch (err) {
                 showNotification('⚠️ Paste denied. Use Ctrl+V');
@@ -2442,6 +2833,7 @@
 
         function clearInput() {
             document.getElementById('input').value = '';
+            updateDiagnostics();
         }
 
         function clearOutput() {
@@ -2467,6 +2859,8 @@
                 toggleSettingsPanel();
             }
         });
+        document.getElementById('input').addEventListener('input', updateDiagnostics);
+        updateDiagnostics();
     </script>
 </body>
 </html>
