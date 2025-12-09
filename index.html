@@ -1,651 +1,2301 @@
-diff --git a/index.html b/index.html
-index 1462901e6e118e974d61b5d2bdb217cac9959c49..4b90bad7437477c021ca4818c4c4cf496db7ca23 100644
---- a/index.html
-+++ b/index.html
-@@ -470,50 +470,138 @@
-         .theme-dark .settings-title {
-             color: #e2e8f0;
-         }
-         .collapse-btn {
-             background: none;
-             border: none;
-             font-size: 16px;
-             cursor: pointer;
-             padding: 4px;
-             color: #4a5568;
-             transition: transform 0.3s;
-         }
-         .theme-dark .collapse-btn {
-             color: #e2e8f0;
-         }
-         .collapse-btn.collapsed {
-             transform: rotate(180deg);
-         }
-         .settings-content {
-             padding: 12px;
-             overflow-y: auto;
-             flex: 1;
-             min-width: 420px;
-             min-height: 0;
-         }
-+        .settings-summary {
-+            display: grid;
-+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-+            gap: 8px;
-+            margin-bottom: 10px;
-+        }
-+        .summary-pill {
-+            background: white;
-+            border: 1px solid #cbd5e0;
-+            color: #4a5568;
-+            border-radius: 8px;
-+            padding: 10px 12px;
-+            font-size: 11px;
-+            display: flex;
-+            justify-content: space-between;
-+            align-items: center;
-+            gap: 8px;
-+        }
-+        .theme-dark .summary-pill {
-+            background: #2d3748;
-+            border-color: #4a5568;
-+            color: #e2e8f0;
-+        }
-+        .settings-grid {
-+            display: grid;
-+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-+            gap: 12px;
-+        }
-+        .settings-card {
-+            background: white;
-+            border: 1px solid #e2e8f0;
-+            border-radius: 10px;
-+            padding: 12px;
-+            box-shadow: 0 6px 16px rgba(0,0,0,0.04);
-+        }
-+        .settings-card h3 {
-+            font-size: 12px;
-+            color: #2d3748;
-+            margin-bottom: 6px;
-+            display: flex;
-+            align-items: center;
-+            gap: 6px;
-+            letter-spacing: 0.3px;
-+            text-transform: uppercase;
-+        }
-+        .settings-card .card-helper {
-+            font-size: 11px;
-+            color: #718096;
-+            margin-bottom: 8px;
-+            line-height: 1.5;
-+        }
-+        .theme-dark .settings-card {
-+            background: #1f2937;
-+            border-color: #4a5568;
-+            box-shadow: none;
-+        }
-+        .theme-dark .settings-card h3 {
-+            color: #e2e8f0;
-+        }
-+        .theme-dark .settings-card .card-helper {
-+            color: #a0aec0;
-+        }
-+        .setting-list {
-+            display: grid;
-+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-+            gap: 6px;
-+        }
-+        .settings-card .setting-item {
-+            background: #f8fafc;
-+            border: 1px solid #e2e8f0;
-+            border-radius: 6px;
-+            padding: 8px;
-+            margin: 0;
-+        }
-+        .theme-dark .settings-card .setting-item {
-+            background: #2d3748;
-+            border-color: #4a5568;
-+        }
-+        .status-list {
-+            font-size: 11px;
-+            color: #4a5568;
-+            line-height: 1.5;
-+            display: grid;
-+            gap: 6px;
-+        }
-+        .theme-dark .status-list {
-+            color: #e2e8f0;
-+        }
-         .tabs {
-             display: flex;
-             gap: 2px;
-             margin-bottom: 12px;
-             border-bottom: 2px solid #e2e8f0;
-         }
-         .theme-dark .tabs {
-             border-bottom-color: #4a5568;
-         }
-         .tab-btn {
-             padding: 8px 12px;
-             background: none;
-             border: none;
-             border-bottom: 3px solid transparent;
-             color: #718096;
-             cursor: pointer;
-             font-size: 11px;
-             font-weight: 600;
-             transition: all 0.2s;
-         }
-         .theme-dark .tab-btn {
-             color: #a0aec0;
-         }
-         .tab-btn:hover {
-             color: #667eea;
-@@ -893,197 +981,211 @@
-                         <span class="panel-title">✨ Output</span>
-                     </div>
-                     <textarea id="output" placeholder="Formatted code will appear here..." readonly spellcheck="false"></textarea>
-                     <div class="button-group">
-                         <button class="btn-secondary" onclick="copyToClipboard()">📋 Copy</button>
-                         <button class="btn-tertiary" onclick="copyOutputToInput()">↩️ To Input</button>
-                         <button class="btn-clear" onclick="clearOutput()">✖</button>
-                     </div>
-                 </div>
-             </div>
-             
-             <div class="settings-panel" id="settingsPanel">
-                 <div class="settings-header">
-                     <span class="settings-title">⚙️ Settings</span>
-                     <button class="collapse-btn" id="collapseBtn" onclick="toggleSettingsPanel()">◀</button>
-                 </div>
-                 <div class="settings-content">
-                     <div class="tabs">
-                         <button class="tab-btn active" onclick="switchTab('global')">Global</button>
-                         <button class="tab-btn" onclick="switchTab('functions')">Functions</button>
-                         <button class="tab-btn" onclick="switchTab('advanced')">Advanced</button>
-                     </div>
- 
-                     <!-- GLOBAL TAB -->
-                     <div id="global-tab" class="tab-content active">
--                        <div class="style-description" id="styleDescription"></div>
--                        
--                        <div class="section-header first">Display</div>
--                        <div class="setting-item">
--                            <label for="fontSize">Font size</label>
--                            <select id="fontSize" onchange="updateFontSize()">
--                                <option value="small">Small</option>
--                                <option value="medium" selected>Medium</option>
--                                <option value="large">Large</option>
--                                <option value="xlarge">X-Large</option>
--                            </select>
--                        </div>
--                        <div class="quick-width-btns">
--                            <button class="quick-width-btn" onclick="setWidth('30%')">30%</button>
--                            <button class="quick-width-btn" onclick="setWidth('40%')">40%</button>
--                            <button class="quick-width-btn" onclick="setWidth('50%')">50%</button>
--                            <button class="quick-width-btn" onclick="setWidth('60%')">60%</button>
--                        </div>
--
--                        <div class="collapsible">
--                            <div class="collapsible-header active" onclick="toggleSection(this)">
--                                <span>INDENTATION</span>
--                                <span class="toggle-icon">▼</span>
-+                        <div class="settings-summary">
-+                            <div class="summary-pill">
-+                                <span>Preset</span>
-+                                <strong id="statusStyleSummary">-</strong>
-                             </div>
--                            <div class="collapsible-content active">
--                                <div class="setting-item">
--                                    <label for="indentSize">Spaces per indent</label>
--                                    <input type="number" id="indentSize" value="2" min="0" max="8" onchange="markModified(); autoFormat()">
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="indentParams" checked onchange="markModified(); autoFormat()">
--                                    <label for="indentParams">Indent parameters</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="indentAfterComma" onchange="markModified(); autoFormat()">
--                                    <label for="indentAfterComma">Extra indent after comma</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="indentBraceContent" onchange="markModified(); autoFormat()">
--                                    <label for="indentBraceContent">Indent brace content</label>
--                                </div>
-+                            <div class="summary-pill">
-+                                <span>Changes</span>
-+                                <strong id="statusModifiedSummary">-</strong>
-+                            </div>
-+                            <div class="summary-pill">
-+                                <span>Function rules</span>
-+                                <strong id="statusFuncSummary">-</strong>
-                             </div>
-                         </div>
- 
--                        <div class="collapsible">
--                            <div class="collapsible-header active" onclick="toggleSection(this)">
--                                <span>SPACING & OPERATORS</span>
--                                <span class="toggle-icon">▼</span>
--                            </div>
--                            <div class="collapsible-content active">
--                                <div class="setting-item">
--                                    <input type="checkbox" id="operatorSpacing" checked onchange="markModified(); autoFormat()">
--                                    <label for="operatorSpacing">Space around operators</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="keepMathOperatorsTogether" checked onchange="markModified(); autoFormat()">
--                                    <label for="keepMathOperatorsTogether">Keep math ops together</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="spaceAfterComma" checked onchange="markModified(); autoFormat()">
--                                    <label for="spaceAfterComma">Space after commas</label>
--                                </div>
-+                        <div class="settings-card">
-+                            <h3>Preset guidance</h3>
-+                            <div class="style-description" id="styleDescription"></div>
-+                            <div class="card-helper">Pick a preset to start, then fine-tune the layout, spacing, and line breaks below. All changes auto-preview in your code.</div>
-+                        </div>
-+
-+                        <div class="settings-grid">
-+                            <div class="settings-card">
-+                                <h3>Layout & Display</h3>
-+                                <div class="card-helper">Workspace controls that affect how the formatter feels.</div>
-                                 <div class="setting-item">
--                                    <label for="commaStyle">Comma style</label>
--                                    <select id="commaStyle" onchange="markModified(); autoFormat()">
--                                        <option value="none">None</option>
--                                        <option value="space" selected>Space only</option>
--                                        <option value="break">Break only</option>
--                                        <option value="both">Space + Break</option>
-+                                    <label for="fontSize">Font size</label>
-+                                    <select id="fontSize" onchange="updateFontSize()">
-+                                        <option value="small">Small</option>
-+                                        <option value="medium" selected>Medium</option>
-+                                        <option value="large">Large</option>
-+                                        <option value="xlarge">X-Large</option>
-                                     </select>
-                                 </div>
--                                <div class="hint">Customize comma formatting beyond space option</div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="spaceBeforeParen" onchange="markModified(); autoFormat()">
--                                    <label for="spaceBeforeParen">Space before parenthesis</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="spaceBeforeBrace" onchange="markModified(); autoFormat()">
--                                    <label for="spaceBeforeBrace">Space before brace</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="operatorNewLine" onchange="markModified(); autoFormat()">
--                                    <label for="operatorNewLine">Operator at line start</label>
-+                                <div class="card-helper" style="margin-top: 6px;">Quickly resize the settings panel.</div>
-+                                <div class="quick-width-btns">
-+                                    <button class="quick-width-btn" onclick="setWidth('30%')">30%</button>
-+                                    <button class="quick-width-btn" onclick="setWidth('40%')">40%</button>
-+                                    <button class="quick-width-btn" onclick="setWidth('50%')">50%</button>
-+                                    <button class="quick-width-btn" onclick="setWidth('60%')">60%</button>
-                                 </div>
-                             </div>
--                        </div>
- 
--                        <div class="collapsible">
--                            <div class="collapsible-header active" onclick="toggleSection(this)">
--                                <span>PARAMETERS (GRANULAR)</span>
--                                <span class="toggle-icon">▼</span>
--                            </div>
--                            <div class="collapsible-content active">
--                                <div class="setting-item">
--                                    <input type="checkbox" id="paramOnSameLine" checked onchange="markModified(); autoFormat()">
--                                    <label for="paramOnSameLine">Params on same line</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="breakAfterFirstParam" onchange="markModified(); autoFormat()">
--                                    <label for="breakAfterFirstParam">Break after 1st param</label>
--                                </div>
--                                <div class="hint">Keep first param with func name, rest on next line</div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="oneParamPerLine" onchange="markModified(); autoFormat()">
--                                    <label for="oneParamPerLine">One param per line</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="trailingComma" onchange="markModified(); autoFormat()">
--                                    <label for="trailingComma">Trailing comma on last param</label>
-+                            <div class="settings-card">
-+                                <h3>Indentation</h3>
-+                                <div class="setting-list">
-+                                    <div class="setting-item">
-+                                        <label for="indentSize">Spaces per indent</label>
-+                                        <input type="number" id="indentSize" value="2" min="0" max="8" onchange="markModified(); autoFormat()">
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="indentParams" checked onchange="markModified(); autoFormat()">
-+                                        <label for="indentParams">Indent parameters</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="indentAfterComma" onchange="markModified(); autoFormat()">
-+                                        <label for="indentAfterComma">Extra indent after comma</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="indentBraceContent" onchange="markModified(); autoFormat()">
-+                                        <label for="indentBraceContent">Indent brace content</label>
-+                                    </div>
-                                 </div>
-                             </div>
--                        </div>
- 
--                        <div class="collapsible">
--                            <div class="collapsible-header active" onclick="toggleSection(this)">
--                                <span>LINE BREAKS & SPACING</span>
--                                <span class="toggle-icon">▼</span>
--                            </div>
--                            <div class="collapsible-content active">
--                                <div class="setting-item">
--                                    <input type="checkbox" id="openParenNewline" onchange="markModified(); autoFormat()">
--                                    <label for="openParenNewline">New line after (</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="closeParenNewline" onchange="markModified(); autoFormat()">
--                                    <label for="closeParenNewline">New line before )</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="openBraceNewline" onchange="markModified(); autoFormat()">
--                                    <label for="openBraceNewline">New line after {</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="closeBraceNewline" onchange="markModified(); autoFormat()">
--                                    <label for="closeBraceNewline">New line before }</label>
--                                </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="semicolonNewline" checked onchange="markModified(); autoFormat()">
--                                    <label for="semicolonNewline">New line after semicolon</label>
-+                            <div class="settings-card">
-+                                <h3>Spacing & Operators</h3>
-+                                <div class="setting-list">
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="operatorSpacing" checked onchange="markModified(); autoFormat()">
-+                                        <label for="operatorSpacing">Space around operators</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="keepMathOperatorsTogether" checked onchange="markModified(); autoFormat()">
-+                                        <label for="keepMathOperatorsTogether">Keep math ops together</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="spaceAfterComma" checked onchange="markModified(); autoFormat()">
-+                                        <label for="spaceAfterComma">Space after commas</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <label for="commaStyle">Comma style</label>
-+                                        <select id="commaStyle" onchange="markModified(); autoFormat()">
-+                                            <option value="none">None</option>
-+                                            <option value="space" selected>Space only</option>
-+                                            <option value="break">Break only</option>
-+                                            <option value="both">Space + Break</option>
-+                                        </select>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="spaceBeforeParen" onchange="markModified(); autoFormat()">
-+                                        <label for="spaceBeforeParen">Space before parenthesis</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="spaceBeforeBrace" onchange="markModified(); autoFormat()">
-+                                        <label for="spaceBeforeBrace">Space before brace</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="operatorNewLine" onchange="markModified(); autoFormat()">
-+                                        <label for="operatorNewLine">Operator at line start</label>
-+                                    </div>
-                                 </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="extraLinesBetweenStatements" onchange="markModified(); autoFormat()">
--                                    <label for="extraLinesBetweenStatements">Extra lines between statements</label>
-+                                <div class="card-helper">Need more than a space? Use comma style to add breaks automatically.</div>
-+                            </div>
-+
-+                            <div class="settings-card">
-+                                <h3>Parameters</h3>
-+                                <div class="setting-list">
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="paramOnSameLine" checked onchange="markModified(); autoFormat()">
-+                                        <label for="paramOnSameLine">Params on same line</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="breakAfterFirstParam" onchange="markModified(); autoFormat()">
-+                                        <label for="breakAfterFirstParam">Break after 1st param</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="oneParamPerLine" onchange="markModified(); autoFormat()">
-+                                        <label for="oneParamPerLine">One param per line</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="trailingComma" onchange="markModified(); autoFormat()">
-+                                        <label for="trailingComma">Trailing comma on last param</label>
-+                                    </div>
-                                 </div>
--                                <div class="setting-item">
--                                    <input type="checkbox" id="extraLinesAfterBraces" onchange="markModified(); autoFormat()">
--                                    <label for="extraLinesAfterBraces">Extra line after closing }</label>
-+                                <div class="card-helper">Keep the first parameter on the same line or break everything into clean, single lines.</div>
-+                            </div>
-+
-+                            <div class="settings-card">
-+                                <h3>Line breaks & flow</h3>
-+                                <div class="setting-list">
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="openParenNewline" onchange="markModified(); autoFormat()">
-+                                        <label for="openParenNewline">New line after (</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="closeParenNewline" onchange="markModified(); autoFormat()">
-+                                        <label for="closeParenNewline">New line before )</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="openBraceNewline" onchange="markModified(); autoFormat()">
-+                                        <label for="openBraceNewline">New line after {</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="closeBraceNewline" onchange="markModified(); autoFormat()">
-+                                        <label for="closeBraceNewline">New line before }</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="semicolonNewline" checked onchange="markModified(); autoFormat()">
-+                                        <label for="semicolonNewline">New line after semicolon</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="extraLinesBetweenStatements" onchange="markModified(); autoFormat()">
-+                                        <label for="extraLinesBetweenStatements">Extra lines between statements</label>
-+                                    </div>
-+                                    <div class="setting-item">
-+                                        <input type="checkbox" id="extraLinesAfterBraces" onchange="markModified(); autoFormat()">
-+                                        <label for="extraLinesAfterBraces">Extra line after closing }</label>
-+                                    </div>
-                                 </div>
-+                                <div class="card-helper">Control breathing room between major statements and around parentheses or braces.</div>
-                             </div>
-                         </div>
- 
-                         <button class="reset-btn" onclick="resetToPreset()">↻ Reset to Preset</button>
-                     </div>
- 
-                     <!-- FUNCTIONS TAB -->
-                     <div id="functions-tab" class="tab-content">
-                         <div class="section-header first">
-                             <span>FUNCTION-SPECIFIC RULES</span>
-                             <span style="font-size: 9px; color: #718096;">Auto-detected from code</span>
-                         </div>
-                         <div id="funcList" class="func-list"></div>
-                         
-                         <div id="funcEditor" style="display: none;">
-                             <div class="section-header" style="margin-bottom: 12px;">
-                                 <span id="selectedFuncName" style="color: #667eea; font-weight: 700;"></span>
-                                 <button class="btn-small btn-clear" onclick="clearFunctionRule()">✕</button>
-                             </div>
- 
-                             <div class="collapsible">
-                                 <div class="collapsible-header active" onclick="toggleSection(this)">
-                                     <span>PARAMETERS</span>
-                                     <span class="toggle-icon">▼</span>
-                                 </div>
-@@ -1141,69 +1243,77 @@
-                                             <option value="">Use global</option>
-                                             <option value="space">Space only</option>
-                                             <option value="break">Line break only</option>
-                                             <option value="both">Space + Break</option>
-                                             <option value="none">No space/break</option>
-                                         </select>
-                                     </div>
-                                     <div class="setting-item">
-                                         <input type="checkbox" id="funcSpaceBeforeBrace" onchange="previewFunctionRule()">
-                                         <label for="funcSpaceBeforeBrace">Space before {</label>
-                                     </div>
-                                     <div class="setting-item">
-                                         <input type="checkbox" id="funcOpenBraceNewline" onchange="previewFunctionRule()">
-                                         <label for="funcOpenBraceNewline">New line after {</label>
-                                     </div>
-                                     <div class="setting-item">
-                                         <input type="checkbox" id="funcCloseBraceNewline" onchange="previewFunctionRule()">
-                                         <label for="funcCloseBraceNewline">New line before }</label>
-                                     </div>
-                                     <div class="setting-item">
-                                         <input type="checkbox" id="funcIndentBraceContent" onchange="previewFunctionRule()">
-                                         <label for="funcIndentBraceContent">Indent brace content</label>
-                                     </div>
-                     <!-- ADVANCED TAB -->
-                     <div id="advanced-tab" class="tab-content">
--                        <div class="section-header first">PRESETS</div>
--                        <div style="font-size: 11px; line-height: 1.6; color: #718096; margin-bottom: 12px;">
--                            <strong>Current Status:</strong><br>
--                            Style: <span id="statusStyle" style="color: #667eea;"></span><br>
--                            Modified: <span id="statusModified" style="color: #f56565;"></span><br>
--                            Function Rules: <span id="statusFuncRules" style="color: #667eea;"></span>
--                        </div>
-+                        <div class="settings-grid">
-+                            <div class="settings-card">
-+                                <h3>Preset status</h3>
-+                                <div class="status-list">
-+                                    <div><strong>Style:</strong> <span id="statusStyle"></span></div>
-+                                    <div><strong>Modified:</strong> <span id="statusModified"></span></div>
-+                                    <div><strong>Function Rules:</strong> <span id="statusFuncRules"></span></div>
-+                                </div>
-+                            </div>
- 
--                        <div class="section-header">MANAGEMENT</div>
--                        <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="saveCurrentAsPreset()">💾 Save as Custom Preset</button>
--                        <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="exportSettings()">↓ Export Settings</button>
--                        <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="importSettings()">↑ Import Settings</button>
--                        <button class="btn-clear" style="width: 100%;" onclick="clearAllRules()">⚠️ Clear All Custom Rules</button>
--
--                        <div class="section-header">KEYBOARD</div>
--                        <div style="font-size: 10px; line-height: 1.8; color: #718096;">
--                            <strong>Ctrl + Enter:</strong> Format code<br>
--                            <strong>Ctrl + ,:</strong> Toggle settings<br>
--                            <strong>Click function:</strong> Edit rule
-+                            <div class="settings-card">
-+                                <h3>Manage presets</h3>
-+                                <div class="card-helper">Save, share, or reset your formatting preferences.</div>
-+                                <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="saveCurrentAsPreset()">💾 Save as Custom Preset</button>
-+                                <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="exportSettings()">↓ Export Settings</button>
-+                                <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="importSettings()">↑ Import Settings</button>
-+                                <button class="btn-clear" style="width: 100%;" onclick="clearAllRules()">⚠️ Clear All Custom Rules</button>
-+                            </div>
-+
-+                            <div class="settings-card">
-+                                <h3>Keyboard</h3>
-+                                <div class="status-list">
-+                                    <div><strong>Ctrl + Enter:</strong> Format code</div>
-+                                    <div><strong>Ctrl + ,:</strong> Toggle settings</div>
-+                                    <div><strong>Click function:</strong> Edit rule</div>
-+                                </div>
-+                            </div>
-                         </div>
-                     </div>
-                 </div>
-             </div>
-         </div>
-     </div>
- 
-     <script>
-         const STYLE_PRESETS = {
-             'ultra-compact': {
-                 name: 'Ultra Compact',
-                 description: 'Minimal whitespace - everything tight and condensed',
-                 indentSize: 2,
-                 indentParams: false,
-                 indentAfterComma: false,
-                 indentBraceContent: false,
-                 operatorSpacing: true,
-                 keepMathOperatorsTogether: true,
-                 spaceAfterComma: true,
-                 commaStyle: 'space',
-                 spaceBeforeParen: false,
-                 spaceBeforeBrace: false,
-                 operatorNewLine: false,
-                 paramOnSameLine: true,
-                 breakAfterFirstParam: false,
-@@ -1709,53 +1819,65 @@
-                 showNotification(`↔️ Width: ${width}`);
-             }
-         }
- 
-         function resetToPreset() {
-             applyStyle(currentStyle);
-             showNotification('↻ Reset to preset');
-         }
- 
-         function saveCurrentAsPreset() {
-             const presetName = prompt('Enter custom preset name:', 'My Preset');
-             if (!presetName || presetName.trim() === '') return;
-             
-             const settings = getSettings();
-             saveCustomPreset(presetName.trim(), settings);
-             showNotification(`💾 Saved as "${presetName.trim()}"`);
-         }
- 
-         function saveAsDefault() {
-             localStorage.setItem('powerFxDefaultStyle', currentStyle);
-             localStorage.setItem('powerFxCustomSettings', JSON.stringify(getSettings()));
-             showNotification('✓ Saved as default');
-         }
- 
-         function updateStatus() {
--            document.getElementById('statusStyle').textContent = STYLE_PRESETS[currentStyle].name;
--            document.getElementById('statusModified').textContent = isModified ? '✓ Custom' : 'No';
--            document.getElementById('statusFuncRules').textContent = Object.keys(functionRules).length;
-+            const styleName = STYLE_PRESETS[currentStyle].name;
-+            const modifiedText = isModified ? '✓ Custom' : 'No';
-+            const funcCount = Object.keys(functionRules).length;
-+
-+            const setText = (id, value) => {
-+                const el = document.getElementById(id);
-+                if (el) el.textContent = value;
-+            };
-+
-+            setText('statusStyle', styleName);
-+            setText('statusStyleSummary', styleName);
-+            setText('statusModified', modifiedText);
-+            setText('statusModifiedSummary', modifiedText);
-+            setText('statusFuncRules', funcCount);
-+            setText('statusFuncSummary', funcCount);
-         }
- 
-         function updateFunctionList() {
-             const list = document.getElementById('funcList');
-             const funcs = Array.from(detectedFunctions).sort();
-             
-             if (funcs.length === 0) {
-                 list.innerHTML = '<div style="font-size: 11px; color: #718096; padding: 12px; text-align: center;">Format code to detect functions</div>';
-                 document.getElementById('addFuncBtn').style.display = 'block';
-                 return;
-             }
- 
-             list.innerHTML = funcs.map(func => `
-                 <div class="func-item ${functionRules[func] ? 'active' : ''}" onclick="selectFunction('${func}')">
-                     <span>${func}</span>
-                     <span>${functionRules[func] ? '✓' : ''}</span>
-                 </div>
-             `).join('');
-         }
- 
-         function selectFunction(funcName) {
-             selectedFunction = funcName;
-             document.getElementById('funcEditor').style.display = 'block';
-             document.getElementById('selectedFuncName').textContent = funcName;
-             
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerFX Code Formatter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+            padding: 10px;
+        }
+        body.theme-dark {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        }
+        .container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .theme-dark .container {
+            background: #1a202c;
+            color: #e2e8f0;
+        }
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 12px 20px;
+            border-bottom: 4px solid #667eea;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-left {
+            flex: 1;
+        }
+        h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .subtitle {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-top: 2px;
+        }
+        .style-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 3px;
+            font-size: 10px;
+            color: #667eea;
+            margin-left: 8px;
+            font-weight: 600;
+        }
+        .header-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .icon-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .styles-bar {
+            background: #f7fafc;
+            padding: 10px 20px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            overflow-x: auto;
+        }
+        .theme-dark .styles-bar {
+            background: #2d3748;
+            border-bottom-color: #4a5568;
+        }
+        .style-label {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .theme-dark .style-label {
+            color: #e2e8f0;
+        }
+        .style-buttons {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .style-btn {
+            padding: 5px 12px;
+            border: 2px solid #cbd5e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #4a5568;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .theme-dark .style-btn {
+            background: #4a5568;
+            border-color: #718096;
+            color: #e2e8f0;
+        }
+        .style-btn:hover {
+            border-color: #667eea;
+        }
+        .style-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .style-btn.modified::after {
+            content: '•';
+            position: absolute;
+            top: 0;
+            right: 4px;
+            color: #f56565;
+            font-size: 16px;
+        }
+        .custom-presets {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding-top: 6px;
+            border-top: 1px solid #cbd5e0;
+            margin-top: 6px;
+        }
+        .theme-dark .custom-presets {
+            border-top-color: #4a5568;
+        }
+        .custom-preset {
+            padding: 5px 12px;
+            border: 2px dashed #cbd5e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #4a5568;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .theme-dark .custom-preset {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: #a0aec0;
+        }
+        .custom-preset:hover {
+            border-color: #48bb78;
+            color: #48bb78;
+        }
+        .theme-dark .custom-preset:hover {
+            color: #68d391;
+        }
+        .custom-preset.active {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+        .modified-indicator {
+            position: absolute;
+            top: 0;
+            right: 4px;
+            color: #f56565;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .save-default-btn {
+            padding: 5px 12px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .save-default-btn:hover {
+            background: #38a169;
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            gap: 0;
+            min-height: 0;
+        }
+        .container.settings-collapsed .main-content {
+            padding-right: 0;
+        }
+        .main-content.vertical {
+            flex-direction: column;
+        }
+        .main-content.vertical .editor-section {
+            flex: 1 1 auto;
+            min-height: 45vh;
+        }
+        .main-content.vertical .settings-panel {
+            width: 100%;
+            min-width: 100%;
+            max-width: 100%;
+            flex: 0 0 auto;
+            border-left: none;
+            border-top: 2px solid #e2e8f0;
+        }
+        .theme-dark .main-content.vertical .settings-panel {
+            border-top-color: #4a5568;
+        }
+        .editor-section {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+            min-width: 0;
+        }
+        .vertical .editor-section {
+            flex-direction: column;
+        }
+        .panel {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 12px;
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+        }
+        .theme-dark .panel {
+            background: #1a202c;
+        }
+        .left-panel {
+            flex: 1;
+            min-width: 100px;
+        }
+        .right-panel {
+            flex: 1;
+            min-width: 100px;
+        }
+        .vertical .left-panel,
+        .vertical .right-panel {
+            flex: 1;
+            min-height: 100px;
+        }
+        .resizer {
+            width: 6px;
+            background: #e2e8f0;
+            cursor: col-resize;
+            position: relative;
+            flex-shrink: 0;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+        .theme-dark .resizer {
+            background: #4a5568;
+        }
+        .vertical .resizer {
+            width: 100%;
+            height: 6px;
+            cursor: row-resize;
+        }
+        .resizer:hover {
+            background: #cbd5e0;
+        }
+        .resizer.active {
+            background: #667eea;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-shrink: 0;
+        }
+        .panel-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 13px;
+        }
+        .theme-dark .panel-title {
+            color: #e2e8f0;
+        }
+        textarea {
+            width: 100%;
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: none;
+            transition: border-color 0.3s;
+            background: white;
+            color: #2d3748;
+            min-height: 0;
+            spellcheck: false;
+        }
+        .theme-dark textarea {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-color: #4a5568;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea.font-small {
+            font-size: 11px;
+        }
+        textarea.font-medium {
+            font-size: 13px;
+        }
+        textarea.font-large {
+            font-size: 15px;
+        }
+        textarea.font-xlarge {
+            font-size: 17px;
+        }
+        .button-group {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 7px 14px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+            min-width: 60px;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+            flex: 1;
+            min-width: 60px;
+        }
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+        .btn-tertiary {
+            background: #ed8936;
+            color: white;
+            flex: 1;
+            min-width: 60px;
+        }
+        .btn-tertiary:hover {
+            background: #dd6b20;
+        }
+        .btn-clear {
+            background: #f56565;
+            color: white;
+            flex: 0;
+        }
+        .btn-clear:hover {
+            background: #e53e3e;
+        }
+        .btn-icon {
+            padding: 7px 12px;
+            background: #e2e8f0;
+            color: #4a5568;
+            flex: 0;
+        }
+        .theme-dark .btn-icon {
+            background: #4a5568;
+            color: #e2e8f0;
+        }
+        .btn-icon:hover {
+            background: #cbd5e0;
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 10px;
+            flex: 0;
+        }
+        .settings-panel {
+            width: 420px;
+            min-width: 420px;
+            background: #f7fafc;
+            border-left: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow: hidden;
+            transition: width 0.25s ease;
+            min-height: 0;
+        }
+        .theme-dark .settings-panel {
+            background: #2d3748;
+            border-left-color: #4a5568;
+        }
+        .settings-panel.collapsed {
+            width: 0;
+            min-width: 0;
+            max-width: 0;
+            flex-basis: 0;
+            padding: 0;
+            border-left: none;
+        }
+        .settings-panel.collapsed .settings-header,
+        .settings-panel.collapsed .settings-content {
+            display: none;
+        }
+        .settings-header {
+            padding: 12px;
+            background: #edf2f7;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            min-width: 420px;
+        }
+        .theme-dark .settings-header {
+            background: #1a202c;
+            border-bottom-color: #4a5568;
+        }
+        .settings-title {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 13px;
+        }
+        .theme-dark .settings-title {
+            color: #e2e8f0;
+        }
+        .collapse-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            color: #4a5568;
+            transition: transform 0.3s;
+        }
+        .theme-dark .collapse-btn {
+            color: #e2e8f0;
+        }
+        .collapse-btn.collapsed {
+            transform: rotate(180deg);
+        }
+        .settings-content {
+            padding: 12px;
+            overflow-y: auto;
+            flex: 1;
+            min-width: 420px;
+            min-height: 0;
+        }
+        .tabs {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .theme-dark .tabs {
+            border-bottom-color: #4a5568;
+        }
+        .tab-btn {
+            padding: 8px 12px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #718096;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .theme-dark .tab-btn {
+            color: #a0aec0;
+        }
+        .tab-btn:hover {
+            color: #667eea;
+        }
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .style-description {
+            font-size: 11px;
+            color: #718096;
+            font-style: italic;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            padding: 6px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 4px;
+        }
+        .theme-dark .style-description {
+            color: #a0aec0;
+            background: rgba(102, 126, 234, 0.2);
+        }
+        .section-header {
+            font-size: 10px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .theme-dark .section-header {
+            color: #e2e8f0;
+        }
+        .section-header.first {
+            margin-top: 0;
+        }
+        .modified-indicator {
+            width: 8px;
+            height: 8px;
+            background: #f56565;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .collapsible {
+            background: white;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .theme-dark .collapsible {
+            background: #4a5568;
+            border-color: #718096;
+        }
+        .collapsible-header {
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #2d3748;
+            background: #f7fafc;
+            transition: all 0.2s;
+        }
+        .theme-dark .collapsible-header {
+            color: #e2e8f0;
+            background: #3a4a5a;
+        }
+        .collapsible-header:hover {
+            background: #edf2f7;
+        }
+        .theme-dark .collapsible-header:hover {
+            background: #4a5a6a;
+        }
+        .collapsible-header.active {
+            background: #667eea;
+            color: white;
+        }
+        .collapsible-header.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        .toggle-icon {
+            transition: transform 0.2s;
+            font-size: 12px;
+        }
+        .collapsible-content {
+            display: none;
+            padding: 12px;
+        }
+        .collapsible-content.active {
+            display: block;
+        }
+        .setting-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 6px;
+            background: white;
+            border-radius: 4px;
+        }
+        .theme-dark .setting-item {
+            background: #2d3748;
+        }
+        .setting-item label {
+            font-size: 11px;
+            color: #4a5568;
+            flex: 1;
+            cursor: pointer;
+            user-select: none;
+        }
+        .theme-dark .setting-item label {
+            color: #e2e8f0;
+        }
+        .setting-item input[type="number"],
+        .setting-item select {
+            width: 50px;
+            padding: 4px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 11px;
+            background: white;
+            color: #2d3748;
+        }
+        .theme-dark .setting-item input[type="number"],
+        .theme-dark .setting-item select {
+            background: #2d3748;
+            border-color: #718096;
+            color: #e2e8f0;
+        }
+        .setting-item select {
+            width: auto;
+            min-width: 70px;
+        }
+        .setting-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #667eea;
+            flex-shrink: 0;
+        }
+        .quick-width-btns {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        .quick-width-btn {
+            flex: 1;
+            padding: 4px;
+            background: white;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .theme-dark .quick-width-btn {
+            background: #2d3748;
+            border-color: #718096;
+            color: #e2e8f0;
+        }
+        .quick-width-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #48bb78;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-weight: 600;
+            font-size: 12px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .settings-toggle-btn {
+            background: #667eea !important;
+            color: white !important;
+            padding: 6px 12px !important;
+        }
+        .settings-toggle-btn:hover {
+            background: #5568d3 !important;
+        }
+        .func-list {
+            background: white;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 8px;
+        }
+        .theme-dark .func-list {
+            background: #4a5568;
+            border-color: #718096;
+        }
+        .func-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .theme-dark .func-item {
+            border-bottom-color: #718096;
+        }
+        .func-item:last-child {
+            border-bottom: none;
+        }
+        .func-item:hover {
+            background: #f0f4f8;
+        }
+        .theme-dark .func-item:hover {
+            background: #5568d3;
+        }
+        .func-item.active {
+            background: #667eea;
+            color: white;
+        }
+        .rule-preview {
+            background: white;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 9px;
+            line-height: 1.4;
+            color: #2d3748;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .theme-dark .rule-preview {
+            background: #2d3748;
+            border-color: #718096;
+            color: #e2e8f0;
+        }
+        .reset-btn {
+            width: 100%;
+            padding: 8px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+        .reset-btn:hover {
+            background: #5568d3;
+        }
+        .hint {
+            font-size: 9px;
+            color: #a0aec0;
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .editor-section {
+                flex-direction: column;
+            }
+            .resizer {
+                width: 100%;
+                height: 6px;
+                cursor: row-resize;
+            }
+            .settings-panel {
+                width: 100%;
+                border-left: none;
+                border-top: 2px solid #e2e8f0;
+                max-height: 35%;
+            }
+            .theme-dark .settings-panel {
+                border-top-color: #4a5568;
+            }
+            .settings-header {
+                min-width: auto;
+            }
+            .settings-content {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 16px;
+            }
+            .subtitle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1>⚡ PowerFX Code Formatter<span class="style-badge" id="activeStyleBadge">Ultra Compact</span></h1>
+                <div class="subtitle">Professional formatting styles for Power Apps</div>
+            </div>
+            <div class="header-controls">
+                <button class="icon-btn" id="themeToggle" onclick="toggleTheme()">🌙</button>
+                <button class="icon-btn" id="layoutToggle" onclick="toggleLayout()">↔️</button>
+                <button class="icon-btn settings-toggle-btn" id="settingsToggleHeader" onclick="toggleSettingsPanel()">⚙️</button>
+            </div>
+        </div>
+        
+        <div class="styles-bar">
+            <span class="style-label">Style:</span>
+            <div class="style-buttons">
+                <button class="style-btn active" data-style="ultra-compact">Ultra Compact</button>
+                <button class="style-btn" data-style="compact">Compact</button>
+                <button class="style-btn" data-style="balanced">Balanced</button>
+                <button class="style-btn" data-style="readable">Readable</button>
+                <button class="style-btn" data-style="python-style">Python-like</button>
+                <button class="style-btn" data-style="javascript-style">JS-like</button>
+                <button class="style-btn" data-style="csharp-style">C#-like</button>
+                <button class="style-btn" data-style="sql-style">SQL-like</button>
+                <button class="style-btn" data-style="one-liner">One-Liner</button>
+            </div>
+            <button class="save-default-btn" onclick="saveAsDefault()">💾 Save</button>
+        </div>
+        
+        <div class="main-content" id="mainContent">
+            <div class="editor-section">
+                <div class="panel left-panel">
+                    <div class="panel-header">
+                        <span class="panel-title">📝 Input</span>
+                    </div>
+                    <textarea id="input" placeholder="Paste your PowerFX code here..." spellcheck="false"></textarea>
+                    <div class="button-group">
+                        <button class="btn-primary" onclick="formatCode()">🔄 Format</button>
+                        <button class="btn-clear" onclick="clearInput()">✖</button>
+                        <button class="btn-icon" onclick="pasteFromClipboard()" title="Paste">📋</button>
+                    </div>
+                </div>
+                
+                <div class="resizer" id="resizer"></div>
+                
+                <div class="panel right-panel">
+                    <div class="panel-header">
+                        <span class="panel-title">✨ Output</span>
+                    </div>
+                    <textarea id="output" placeholder="Formatted code will appear here..." readonly spellcheck="false"></textarea>
+                    <div class="button-group">
+                        <button class="btn-secondary" onclick="copyToClipboard()">📋 Copy</button>
+                        <button class="btn-tertiary" onclick="copyOutputToInput()">↩️ To Input</button>
+                        <button class="btn-clear" onclick="clearOutput()">✖</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="settings-panel" id="settingsPanel">
+                <div class="settings-header">
+                    <span class="settings-title">⚙️ Settings</span>
+                    <button class="collapse-btn" id="collapseBtn" onclick="toggleSettingsPanel()">◀</button>
+                </div>
+                <div class="settings-content">
+                    <div class="tabs">
+                        <button class="tab-btn active" onclick="switchTab('global')">Global</button>
+                        <button class="tab-btn" onclick="switchTab('functions')">Functions</button>
+                        <button class="tab-btn" onclick="switchTab('advanced')">Advanced</button>
+                    </div>
+
+                    <!-- GLOBAL TAB -->
+                    <div id="global-tab" class="tab-content active">
+                        <div class="style-description" id="styleDescription"></div>
+                        
+                        <div class="section-header first">Display</div>
+                        <div class="setting-item">
+                            <label for="fontSize">Font size</label>
+                            <select id="fontSize" onchange="updateFontSize()">
+                                <option value="small">Small</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="large">Large</option>
+                                <option value="xlarge">X-Large</option>
+                            </select>
+                        </div>
+                        <div class="quick-width-btns">
+                            <button class="quick-width-btn" onclick="setWidth('30%')">30%</button>
+                            <button class="quick-width-btn" onclick="setWidth('40%')">40%</button>
+                            <button class="quick-width-btn" onclick="setWidth('50%')">50%</button>
+                            <button class="quick-width-btn" onclick="setWidth('60%')">60%</button>
+                        </div>
+
+                        <div class="collapsible">
+                            <div class="collapsible-header active" onclick="toggleSection(this)">
+                                <span>INDENTATION</span>
+                                <span class="toggle-icon">▼</span>
+                            </div>
+                            <div class="collapsible-content active">
+                                <div class="setting-item">
+                                    <label for="indentSize">Spaces per indent</label>
+                                    <input type="number" id="indentSize" value="2" min="0" max="8" onchange="markModified(); autoFormat()">
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="indentParams" checked onchange="markModified(); autoFormat()">
+                                    <label for="indentParams">Indent parameters</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="indentAfterComma" onchange="markModified(); autoFormat()">
+                                    <label for="indentAfterComma">Extra indent after comma</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="indentBraceContent" onchange="markModified(); autoFormat()">
+                                    <label for="indentBraceContent">Indent brace content</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible">
+                            <div class="collapsible-header active" onclick="toggleSection(this)">
+                                <span>SPACING & OPERATORS</span>
+                                <span class="toggle-icon">▼</span>
+                            </div>
+                            <div class="collapsible-content active">
+                                <div class="setting-item">
+                                    <input type="checkbox" id="operatorSpacing" checked onchange="markModified(); autoFormat()">
+                                    <label for="operatorSpacing">Space around operators</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="keepMathOperatorsTogether" checked onchange="markModified(); autoFormat()">
+                                    <label for="keepMathOperatorsTogether">Keep math ops together</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="spaceAfterComma" checked onchange="markModified(); autoFormat()">
+                                    <label for="spaceAfterComma">Space after commas</label>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="commaStyle">Comma style</label>
+                                    <select id="commaStyle" onchange="markModified(); autoFormat()">
+                                        <option value="none">None</option>
+                                        <option value="space" selected>Space only</option>
+                                        <option value="break">Break only</option>
+                                        <option value="both">Space + Break</option>
+                                    </select>
+                                </div>
+                                <div class="hint">Customize comma formatting beyond space option</div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="spaceBeforeParen" onchange="markModified(); autoFormat()">
+                                    <label for="spaceBeforeParen">Space before parenthesis</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="spaceBeforeBrace" onchange="markModified(); autoFormat()">
+                                    <label for="spaceBeforeBrace">Space before brace</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="operatorNewLine" onchange="markModified(); autoFormat()">
+                                    <label for="operatorNewLine">Operator at line start</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible">
+                            <div class="collapsible-header active" onclick="toggleSection(this)">
+                                <span>PARAMETERS (GRANULAR)</span>
+                                <span class="toggle-icon">▼</span>
+                            </div>
+                            <div class="collapsible-content active">
+                                <div class="setting-item">
+                                    <input type="checkbox" id="paramOnSameLine" checked onchange="markModified(); autoFormat()">
+                                    <label for="paramOnSameLine">Params on same line</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="breakAfterFirstParam" onchange="markModified(); autoFormat()">
+                                    <label for="breakAfterFirstParam">Break after 1st param</label>
+                                </div>
+                                <div class="hint">Keep first param with func name, rest on next line</div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="oneParamPerLine" onchange="markModified(); autoFormat()">
+                                    <label for="oneParamPerLine">One param per line</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="trailingComma" onchange="markModified(); autoFormat()">
+                                    <label for="trailingComma">Trailing comma on last param</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible">
+                            <div class="collapsible-header active" onclick="toggleSection(this)">
+                                <span>LINE BREAKS & SPACING</span>
+                                <span class="toggle-icon">▼</span>
+                            </div>
+                            <div class="collapsible-content active">
+                                <div class="setting-item">
+                                    <input type="checkbox" id="openParenNewline" onchange="markModified(); autoFormat()">
+                                    <label for="openParenNewline">New line after (</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="closeParenNewline" onchange="markModified(); autoFormat()">
+                                    <label for="closeParenNewline">New line before )</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="openBraceNewline" onchange="markModified(); autoFormat()">
+                                    <label for="openBraceNewline">New line after {</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="closeBraceNewline" onchange="markModified(); autoFormat()">
+                                    <label for="closeBraceNewline">New line before }</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="semicolonNewline" checked onchange="markModified(); autoFormat()">
+                                    <label for="semicolonNewline">New line after semicolon</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="extraLinesBetweenStatements" onchange="markModified(); autoFormat()">
+                                    <label for="extraLinesBetweenStatements">Extra lines between statements</label>
+                                </div>
+                                <div class="setting-item">
+                                    <input type="checkbox" id="extraLinesAfterBraces" onchange="markModified(); autoFormat()">
+                                    <label for="extraLinesAfterBraces">Extra line after closing }</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="reset-btn" onclick="resetToPreset()">↻ Reset to Preset</button>
+                    </div>
+
+                    <!-- FUNCTIONS TAB -->
+                    <div id="functions-tab" class="tab-content">
+                        <div class="section-header first">
+                            <span>FUNCTION-SPECIFIC RULES</span>
+                            <span style="font-size: 9px; color: #718096;">Auto-detected from code</span>
+                        </div>
+                        <div id="funcList" class="func-list"></div>
+                        
+                        <div id="funcEditor" style="display: none;">
+                            <div class="section-header" style="margin-bottom: 12px;">
+                                <span id="selectedFuncName" style="color: #667eea; font-weight: 700;"></span>
+                                <button class="btn-small btn-clear" onclick="clearFunctionRule()">✕</button>
+                            </div>
+
+                            <div class="collapsible">
+                                <div class="collapsible-header active" onclick="toggleSection(this)">
+                                    <span>PARAMETERS</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="collapsible-content active">
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcParamOnSameLine" checked onchange="previewFunctionRule()">
+                                        <label for="funcParamOnSameLine">Params on same line</label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcBreakAfterFirst" onchange="previewFunctionRule()">
+                                        <label for="funcBreakAfterFirst">Break after 1st param</label>
+                                    </div>
+                                    <div class="hint">E.g., Set(var, value) → Set(var,<br/>  value)</div>
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcOneParamPerLine" onchange="previewFunctionRule()">
+                                        <label for="funcOneParamPerLine">One param per line</label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcIndentParams" onchange="previewFunctionRule()">
+                                        <label for="funcIndentParams">Indent parameters</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="collapsible">
+                                <div class="collapsible-header active" onclick="toggleSection(this)">
+                                    <span>LINE BREAKS</span>
+                                    <span class="toggle-icon">▼</span>
+                                </div>
+                                <div class="collapsible-content active">
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcOpenParenNewline" onchange="previewFunctionRule()">
+                                        <label for="funcOpenParenNewline">New line after (</label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcCloseParenNewline" onchange="previewFunctionRule()">
+                                        <label for="funcCloseParenNewline">New line before )</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section-header">PREVIEW</div>
+                            <div class="rule-preview" id="rulePreview"></div>
+
+                            <button class="btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveFunctionRule()">✓ Save Rule</button>
+                        </div>
+
+                        <button class="btn-primary" style="width: 100%; margin-top: 12px; display: none;" id="addFuncBtn" onclick="createNewFunctionRule()">+ Create Custom Rule</button>
+                    </div>
+
+                                    <div class="section-header">Commas & Braces</div>
+                                    <div class="setting-item">
+                                        <label for="funcCommaStyle">Comma style (override)</label>
+                                        <select id="funcCommaStyle" onchange="previewFunctionRule()">
+                                            <option value="">Use global</option>
+                                            <option value="space">Space only</option>
+                                            <option value="break">Line break only</option>
+                                            <option value="both">Space + Break</option>
+                                            <option value="none">No space/break</option>
+                                        </select>
+                                    </div>
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcSpaceBeforeBrace" onchange="previewFunctionRule()">
+                                        <label for="funcSpaceBeforeBrace">Space before {</label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcOpenBraceNewline" onchange="previewFunctionRule()">
+                                        <label for="funcOpenBraceNewline">New line after {</label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcCloseBraceNewline" onchange="previewFunctionRule()">
+                                        <label for="funcCloseBraceNewline">New line before }</label>
+                                    </div>
+                                    <div class="setting-item">
+                                        <input type="checkbox" id="funcIndentBraceContent" onchange="previewFunctionRule()">
+                                        <label for="funcIndentBraceContent">Indent brace content</label>
+                                    </div>
+                    <!-- ADVANCED TAB -->
+                    <div id="advanced-tab" class="tab-content">
+                        <div class="section-header first">PRESETS</div>
+                        <div style="font-size: 11px; line-height: 1.6; color: #718096; margin-bottom: 12px;">
+                            <strong>Current Status:</strong><br>
+                            Style: <span id="statusStyle" style="color: #667eea;"></span><br>
+                            Modified: <span id="statusModified" style="color: #f56565;"></span><br>
+                            Function Rules: <span id="statusFuncRules" style="color: #667eea;"></span>
+                        </div>
+
+                        <div class="section-header">MANAGEMENT</div>
+                        <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="saveCurrentAsPreset()">💾 Save as Custom Preset</button>
+                        <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="exportSettings()">↓ Export Settings</button>
+                        <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="importSettings()">↑ Import Settings</button>
+                        <button class="btn-clear" style="width: 100%;" onclick="clearAllRules()">⚠️ Clear All Custom Rules</button>
+
+                        <div class="section-header">KEYBOARD</div>
+                        <div style="font-size: 10px; line-height: 1.8; color: #718096;">
+                            <strong>Ctrl + Enter:</strong> Format code<br>
+                            <strong>Ctrl + ,:</strong> Toggle settings<br>
+                            <strong>Click function:</strong> Edit rule
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STYLE_PRESETS = {
+            'ultra-compact': {
+                name: 'Ultra Compact',
+                description: 'Minimal whitespace - everything tight and condensed',
+                indentSize: 2,
+                indentParams: false,
+                indentAfterComma: false,
+                indentBraceContent: false,
+                operatorSpacing: true,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: true,
+                commaStyle: 'space',
+                spaceBeforeParen: false,
+                spaceBeforeBrace: false,
+                operatorNewLine: false,
+                paramOnSameLine: true,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: false,
+                closeParenNewline: false,
+                openBraceNewline: false,
+                closeBraceNewline: false,
+                semicolonNewline: false,
+                extraLinesBetweenStatements: false,
+                extraLinesAfterBraces: false,
+            },
+            'compact': {
+                name: 'Compact',
+                description: 'Balanced compact style - tight but readable',
+                indentSize: 2,
+                indentParams: false,
+                indentAfterComma: false,
+                indentBraceContent: false,
+                operatorSpacing: true,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: true,
+                commaStyle: 'space',
+                spaceBeforeParen: false,
+                spaceBeforeBrace: false,
+                operatorNewLine: false,
+                paramOnSameLine: true,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: false,
+                closeParenNewline: false,
+                openBraceNewline: false,
+                closeBraceNewline: false,
+                semicolonNewline: true,
+                extraLinesBetweenStatements: false,
+                extraLinesAfterBraces: false,
+            },
+            'balanced': {
+                name: 'Balanced',
+                description: 'Good mix of compact and readable',
+                indentSize: 3,
+                indentParams: true,
+                indentAfterComma: false,
+                indentBraceContent: true,
+                operatorSpacing: true,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: true,
+                commaStyle: 'space',
+                spaceBeforeParen: false,
+                spaceBeforeBrace: true,
+                operatorNewLine: false,
+                paramOnSameLine: false,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: false,
+                closeParenNewline: false,
+                openBraceNewline: true,
+                closeBraceNewline: true,
+                semicolonNewline: true,
+                extraLinesBetweenStatements: true,
+                extraLinesAfterBraces: true,
+            },
+            'readable': {
+                name: 'Readable',
+                description: 'More whitespace for easier reading',
+                indentSize: 4,
+                indentParams: true,
+                indentAfterComma: true,
+                indentBraceContent: true,
+                operatorSpacing: true,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: true,
+                commaStyle: 'both',
+                spaceBeforeParen: true,
+                spaceBeforeBrace: true,
+                operatorNewLine: false,
+                paramOnSameLine: false,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: true,
+                closeParenNewline: true,
+                openBraceNewline: true,
+                closeBraceNewline: true,
+                semicolonNewline: true,
+                extraLinesBetweenStatements: true,
+                extraLinesAfterBraces: true,
+            },
+            'python-style': {
+                name: 'Python-like',
+                description: 'Clean and readable like Python',
+                indentSize: 4,
+                indentParams: true,
+                indentAfterComma: false,
+                indentBraceContent: true,
+                operatorSpacing: true,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: true,
+                commaStyle: 'space',
+                spaceBeforeParen: false,
+                spaceBeforeBrace: true,
+                operatorNewLine: true,
+                paramOnSameLine: false,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: false,
+                closeParenNewline: false,
+                openBraceNewline: true,
+                closeBraceNewline: true,
+                semicolonNewline: true,
+                extraLinesBetweenStatements: true,
+                extraLinesAfterBraces: false,
+            },
+            'javascript-style': {
+                name: 'JavaScript-like',
+                description: 'Modern JavaScript conventions',
+                indentSize: 2,
+                indentParams: true,
+                indentAfterComma: false,
+                indentBraceContent: true,
+                operatorSpacing: true,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: true,
+                commaStyle: 'space',
+                spaceBeforeParen: false,
+                spaceBeforeBrace: true,
+                operatorNewLine: false,
+                paramOnSameLine: true,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: false,
+                closeParenNewline: false,
+                openBraceNewline: true,
+                closeBraceNewline: false,
+                semicolonNewline: true,
+                extraLinesBetweenStatements: false,
+                extraLinesAfterBraces: false,
+            },
+            'csharp-style': {
+                name: 'C#-like',
+                description: 'Microsoft C# standards',
+                indentSize: 4,
+                indentParams: true,
+                indentAfterComma: false,
+                indentBraceContent: true,
+                operatorSpacing: true,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: true,
+                commaStyle: 'space',
+                spaceBeforeParen: true,
+                spaceBeforeBrace: true,
+                operatorNewLine: false,
+                paramOnSameLine: false,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: false,
+                closeParenNewline: false,
+                openBraceNewline: true,
+                closeBraceNewline: true,
+                semicolonNewline: true,
+                extraLinesBetweenStatements: true,
+                extraLinesAfterBraces: true,
+            },
+            'sql-style': {
+                name: 'SQL-like',
+                description: 'SQL formatting - emphasizes separation',
+                indentSize: 3,
+                indentParams: true,
+                indentAfterComma: false,
+                indentBraceContent: true,
+                operatorSpacing: true,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: true,
+                commaStyle: 'both',
+                spaceBeforeParen: false,
+                spaceBeforeBrace: true,
+                operatorNewLine: true,
+                paramOnSameLine: false,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: false,
+                closeParenNewline: false,
+                openBraceNewline: true,
+                closeBraceNewline: true,
+                semicolonNewline: true,
+                extraLinesBetweenStatements: true,
+                extraLinesAfterBraces: true,
+            },
+            'one-liner': {
+                name: 'One-Liner',
+                description: 'Everything on one line',
+                indentSize: 0,
+                indentParams: false,
+                indentAfterComma: false,
+                indentBraceContent: false,
+                operatorSpacing: false,
+                keepMathOperatorsTogether: true,
+                spaceAfterComma: false,
+                commaStyle: 'none',
+                spaceBeforeParen: false,
+                spaceBeforeBrace: false,
+                operatorNewLine: false,
+                paramOnSameLine: true,
+                breakAfterFirstParam: false,
+                oneParamPerLine: false,
+                trailingComma: false,
+                openParenNewline: false,
+                closeParenNewline: false,
+                openBraceNewline: false,
+                closeBraceNewline: false,
+                semicolonNewline: false,
+                extraLinesBetweenStatements: false,
+                extraLinesAfterBraces: false,
+            }
+        };
+
+        let currentStyle = 'ultra-compact';
+        let userLayoutPreference = 'horizontal';
+        let globalSettings = {};
+        let functionRules = {};
+        let detectedFunctions = new Set();
+        let presetSettings = {};
+        let isModified = false;
+        let resizingElement = null;
+        let selectedFunction = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPreferences();
+            setupStyleButtons();
+            applyStyle('ultra-compact');
+            updateLayoutDisplay();
+            loadFunctionRules();
+            updateStatus();
+        });
+
+        window.addEventListener('resize', () => {
+            updateLayoutDisplay();
+        });
+
+        function toggleSection(el) {
+            const content = el.nextElementSibling;
+            el.classList.toggle('active');
+            content.classList.toggle('active');
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function loadPreferences() {
+            const theme = localStorage.getItem('powerFxTheme') || 'light';
+            const layout = localStorage.getItem('powerFxLayout') || 'horizontal';
+            const fontSize = localStorage.getItem('powerFxFontSize') || 'medium';
+            
+            if (theme === 'dark') {
+                document.body.classList.add('theme-dark');
+                document.getElementById('themeToggle').textContent = '☀️';
+            }
+            
+            userLayoutPreference = layout;
+            document.getElementById('fontSize').value = fontSize;
+            updateFontSize();
+        }
+
+        function loadFunctionRules() {
+            const saved = localStorage.getItem('powerFxFunctionRules');
+            functionRules = saved ? JSON.parse(saved) : {};
+        }
+
+        function loadCustomPresets() {
+            const saved = localStorage.getItem('powerFxCustomPresets');
+            return saved ? JSON.parse(saved) : {};
+        }
+
+        function saveCustomPreset(name, settings) {
+            const customPresets = loadCustomPresets();
+            customPresets[name] = settings;
+            localStorage.setItem('powerFxCustomPresets', JSON.stringify(customPresets));
+            rebuildStyleButtons();
+        }
+
+        function deleteCustomPreset(name) {
+            const customPresets = loadCustomPresets();
+            delete customPresets[name];
+            localStorage.setItem('powerFxCustomPresets', JSON.stringify(customPresets));
+            rebuildStyleButtons();
+        }
+
+        function compareSettings(saved, current) {
+            // Compare relevant formatting settings
+            const keys = [
+                'indentSize', 'indentBraceContent', 'spaceBeforeParentheses',
+                'spaceInsideParentheses', 'spaceAfterComma', 'commaStyle',
+                'breakAfterOperators', 'oneParamPerLine', 'breakAfterFirstParam',
+                'paramOnSameLine', 'breakAroundKeywords', 'keywords',
+                'semiColonAtEnd', 'semicolonNewline', 'extraLinesBetweenStatements',
+                'extraLinesAfterBraces'
+            ];
+            
+            for (const key of keys) {
+                if (saved[key] !== current[key]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function saveFunctionRules() {
+            localStorage.setItem('powerFxFunctionRules', JSON.stringify(functionRules));
+        }
+
+        function rebuildStyleButtons() {
+            const container = document.querySelector('.style-buttons');
+            if (!container) return;
+            
+            // Keep default presets
+            Array.from(container.querySelectorAll('.style-btn')).forEach(btn => {
+                if (!btn.dataset.custom) {
+                    btn.addEventListener('click', () => {
+                        const style = btn.dataset.style;
+                        applyStyle(style);
+                    });
+                }
+            });
+            
+            // Add custom presets
+            const customPresets = loadCustomPresets();
+            const customContainer = container.querySelector('.custom-presets') || 
+                (() => {
+                    const div = document.createElement('div');
+                    div.className = 'custom-presets';
+                    container.appendChild(div);
+                    return div;
+                })();
+            
+            customContainer.innerHTML = '';
+            Object.entries(customPresets).forEach(([name, settings]) => {
+                const btn = document.createElement('button');
+                btn.className = 'style-btn custom-preset';
+                btn.dataset.style = name;
+                btn.dataset.custom = 'true';
+                btn.innerHTML = `${name} <span class="modified-indicator" style="display:none;">●</span>`;
+                
+                btn.addEventListener('click', () => {
+                    applyStyle(name, settings);
+                });
+                
+                // Right-click to delete
+                btn.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    if (confirm(`Delete custom preset "${name}"?`)) {
+                        deleteCustomPreset(name);
+                    }
+                });
+                
+                customContainer.appendChild(btn);
+            });
+        }
+
+        function setupStyleButtons() {
+            rebuildStyleButtons();
+        }
+
+        function applyStyle(styleName, customPreset = null) {
+            let preset = customPreset || STYLE_PRESETS[styleName];
+            if (!preset) return;
+            
+            currentStyle = styleName;
+            presetSettings = { ...preset };
+            isModified = false;
+            
+            document.getElementById('styleDescription').textContent = preset.description || styleName;
+            document.getElementById('activeStyleBadge').textContent = preset.name || styleName;
+            
+            // Apply all settings from preset
+            Object.keys(preset).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) {
+                    if (el.type === 'checkbox') {
+                        el.checked = preset[key];
+                    } else if (el.type === 'number' || el.tagName === 'INPUT') {
+                        el.value = preset[key];
+                    } else if (el.tagName === 'SELECT') {
+                        el.value = preset[key];
+                    }
+                }
+            });
+            
+            document.querySelectorAll('.style-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.style === styleName);
+                btn.classList.remove('modified');
+                const indicator = btn.querySelector('.modified-indicator');
+                if (indicator) indicator.style.display = 'none';
+            });
+            
+            updateStatus();
+            autoFormat();
+        }
+
+        function markModified() {
+            isModified = true;
+            const activeBtn = document.querySelector(`.style-btn.active`);
+            if (activeBtn) {
+                activeBtn.classList.add('modified');
+                const indicator = activeBtn.querySelector('.modified-indicator');
+                if (indicator) indicator.style.display = 'inline';
+            }
+            updateStatus();
+        }
+
+        function getSettings() {
+            const settings = {};
+            const settingIds = ['indentSize', 'indentParams', 'indentAfterComma', 'indentBraceContent', 'operatorSpacing', 'keepMathOperatorsTogether', 'spaceAfterComma', 'commaStyle', 'spaceBeforeParen', 'spaceBeforeBrace', 'operatorNewLine', 'paramOnSameLine', 'breakAfterFirstParam', 'oneParamPerLine', 'trailingComma', 'openParenNewline', 'closeParenNewline', 'openBraceNewline', 'closeBraceNewline', 'semicolonNewline', 'extraLinesBetweenStatements', 'extraLinesAfterBraces'];
+            
+            settingIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (el.type === 'checkbox') {
+                        settings[id] = el.checked;
+                    } else if (el.type === 'number') {
+                        settings[id] = Math.max(0, parseInt(el.value) || 0);
+                    } else if (el.tagName === 'SELECT') {
+                        settings[id] = el.value;
+                    }
+                }
+            });
+            return settings;
+        }
+
+        function autoFormat() {
+            if (document.getElementById('input').value.trim()) {
+                formatCode();
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('theme-dark');
+            document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('powerFxTheme', isDark ? 'dark' : 'light');
+        }
+
+        function toggleLayout() {
+            userLayoutPreference = userLayoutPreference === 'horizontal' ? 'vertical' : 'horizontal';
+            localStorage.setItem('powerFxLayout', userLayoutPreference);
+            updateLayoutDisplay();
+        }
+
+        function updateLayoutDisplay() {
+            const mainContent = document.getElementById('mainContent');
+            const layoutBtn = document.getElementById('layoutToggle');
+            const leftPanel = document.querySelector('.left-panel');
+            const rightPanel = document.querySelector('.right-panel');
+            
+            // Reset flex values when switching layout
+            leftPanel.style.flex = '1';
+            rightPanel.style.flex = '1';
+            
+            if (userLayoutPreference === 'vertical') {
+                mainContent.classList.add('vertical');
+                layoutBtn.textContent = '↕️';
+            } else {
+                mainContent.classList.remove('vertical');
+                layoutBtn.textContent = '↔️';
+            }
+        }
+
+        function toggleSettingsPanel() {
+            const panel = document.getElementById('settingsPanel');
+            const btn = document.getElementById('collapseBtn');
+            const container = document.querySelector('.container');
+            
+            const isCollapsed = panel.classList.toggle('collapsed');
+            btn.classList.toggle('collapsed', isCollapsed);
+            container.classList.toggle('settings-collapsed', isCollapsed);
+        }
+
+        function updateFontSize() {
+            const size = document.getElementById('fontSize').value;
+            document.querySelectorAll('textarea').forEach(ta => {
+                ta.className = ta.className.replace(/font-\w+/g, '');
+                ta.classList.add(`font-${size}`);
+            });
+            localStorage.setItem('powerFxFontSize', size);
+        }
+
+        function setWidth(width) {
+            const container = document.querySelector('.container');
+            if (container.style.width === width) {
+                container.style.width = '100%';
+                showNotification('↔️ Reset to full width');
+            } else {
+                container.style.width = width;
+                showNotification(`↔️ Width: ${width}`);
+            }
+        }
+
+        function resetToPreset() {
+            applyStyle(currentStyle);
+            showNotification('↻ Reset to preset');
+        }
+
+        function saveCurrentAsPreset() {
+            const presetName = prompt('Enter custom preset name:', 'My Preset');
+            if (!presetName || presetName.trim() === '') return;
+            
+            const settings = getSettings();
+            saveCustomPreset(presetName.trim(), settings);
+            showNotification(`💾 Saved as "${presetName.trim()}"`);
+        }
+
+        function saveAsDefault() {
+            localStorage.setItem('powerFxDefaultStyle', currentStyle);
+            localStorage.setItem('powerFxCustomSettings', JSON.stringify(getSettings()));
+            showNotification('✓ Saved as default');
+        }
+
+        function updateStatus() {
+            document.getElementById('statusStyle').textContent = STYLE_PRESETS[currentStyle].name;
+            document.getElementById('statusModified').textContent = isModified ? '✓ Custom' : 'No';
+            document.getElementById('statusFuncRules').textContent = Object.keys(functionRules).length;
+        }
+
+        function updateFunctionList() {
+            const list = document.getElementById('funcList');
+            const funcs = Array.from(detectedFunctions).sort();
+            
+            if (funcs.length === 0) {
+                list.innerHTML = '<div style="font-size: 11px; color: #718096; padding: 12px; text-align: center;">Format code to detect functions</div>';
+                document.getElementById('addFuncBtn').style.display = 'block';
+                return;
+            }
+
+            list.innerHTML = funcs.map(func => `
+                <div class="func-item ${functionRules[func] ? 'active' : ''}" onclick="selectFunction('${func}')">
+                    <span>${func}</span>
+                    <span>${functionRules[func] ? '✓' : ''}</span>
+                </div>
+            `).join('');
+        }
+
+        function selectFunction(funcName) {
+            selectedFunction = funcName;
+            document.getElementById('funcEditor').style.display = 'block';
+            document.getElementById('selectedFuncName').textContent = funcName;
+            
+            const rule = functionRules[funcName] || {};
+            document.getElementById('funcParamOnSameLine').checked = rule.paramOnSameLine !== false;
+            document.getElementById('funcBreakAfterFirst').checked = rule.breakAfterFirstParam === true;
+            document.getElementById('funcOneParamPerLine').checked = rule.oneParamPerLine === true;
+            document.getElementById('funcIndentParams').checked = rule.indentParams === true;
+            document.getElementById('funcOpenParenNewline').checked = rule.openParenNewline === true;
+            document.getElementById('funcCloseParenNewline').checked = rule.closeParenNewline === true;
+            document.getElementById('funcCommaStyle').value = rule.commaStyle || '';
+            document.getElementById('funcSpaceBeforeBrace').checked = rule.spaceBeforeBrace === true;
+            document.getElementById('funcOpenBraceNewline').checked = rule.openBraceNewline === true;
+            document.getElementById('funcCloseBraceNewline').checked = rule.closeBraceNewline === true;
+            document.getElementById('funcIndentBraceContent').checked = rule.indentBraceContent === true;
+            
+            previewFunctionRule();
+            
+            document.querySelectorAll('.func-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function previewFunctionRule() {
+            const sameOneLine = document.getElementById('funcParamOnSameLine').checked;
+            const breakAfterFirst = document.getElementById('funcBreakAfterFirst').checked;
+            const onePerLine = document.getElementById('funcOneParamPerLine').checked;
+            const openNewline = document.getElementById('funcOpenParenNewline').checked;
+            const closeNewline = document.getElementById('funcCloseParenNewline').checked;
+            const indentParams = document.getElementById('funcIndentParams').checked;
+            
+            let preview = `${selectedFunction}(`;
+            const indent = indentParams ? '  ' : '';
+            
+            if (onePerLine) {
+                preview += `\n${indent}param1,\n${indent}param2,\n${indent}param3`;
+                if (closeNewline) preview += '\n';
+                preview += ')';
+            } else if (breakAfterFirst) {
+                preview += `param1,\n${indent}param2, param3`;
+                if (closeNewline) preview += '\n';
+                preview += ')';
+            } else if (openNewline) {
+                preview += `\n${indent}param1, param2, param3`;
+                if (closeNewline) preview += '\n';
+                preview += ')';
+            } else if (sameOneLine) {
+                preview += 'param1, param2, param3)';
+            } else {
+                preview += `\n${indent}param1,\n${indent}param2,\n${indent}param3`;
+                if (closeNewline) preview += '\n';
+                preview += ')';
+            }
+            
+            document.getElementById('rulePreview').textContent = preview;
+        }
+
+        function saveFunctionRule() {
+            if (!selectedFunction) return;
+            
+            functionRules[selectedFunction] = {
+                paramOnSameLine: document.getElementById('funcParamOnSameLine').checked,
+                breakAfterFirstParam: document.getElementById('funcBreakAfterFirst').checked,
+                oneParamPerLine: document.getElementById('funcOneParamPerLine').checked,
+                indentParams: document.getElementById('funcIndentParams').checked,
+                openParenNewline: document.getElementById('funcOpenParenNewline').checked,
+                closeParenNewline: document.getElementById('funcCloseParenNewline').checked,
+                commaStyle: document.getElementById('funcCommaStyle').value || undefined,
+                spaceBeforeBrace: document.getElementById('funcSpaceBeforeBrace').checked,
+                openBraceNewline: document.getElementById('funcOpenBraceNewline').checked,
+                closeBraceNewline: document.getElementById('funcCloseBraceNewline').checked,
+                indentBraceContent: document.getElementById('funcIndentBraceContent').checked,
+            };
+            
+            saveFunctionRules();
+            updateFunctionList();
+            autoFormat();
+            showNotification(`✓ Rule saved for ${selectedFunction}`);
+        }
+
+        function clearFunctionRule() {
+            if (!selectedFunction) return;
+            delete functionRules[selectedFunction];
+            saveFunctionRules();
+            updateFunctionList();
+            document.getElementById('funcEditor').style.display = 'none';
+            autoFormat();
+            showNotification(`✓ Rule cleared for ${selectedFunction}`);
+        }
+
+        function createNewFunctionRule() {
+            const funcName = prompt('Enter function name (e.g., Patch, Set):');
+            if (!funcName) return;
+            selectFunction(funcName);
+        }
+
+        function clearAllRules() {
+            if (confirm('Clear all function rules? This cannot be undone.')) {
+                functionRules = {};
+                saveFunctionRules();
+                updateFunctionList();
+                document.getElementById('funcEditor').style.display = 'none';
+                autoFormat();
+                updateStatus();
+                showNotification('⚠️ All rules cleared');
+            }
+        }
+
+        function exportSettings() {
+            const data = {
+                style: currentStyle,
+                globalSettings: getSettings(),
+                functionRules: functionRules
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'powerfx-formatter-settings.json';
+            a.click();
+            showNotification('↓ Settings exported');
+        }
+
+        function importSettings() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        applyStyle(data.style);
+                        Object.keys(data.globalSettings).forEach(key => {
+                            const el = document.getElementById(key);
+                            if (el) {
+                                if (el.type === 'checkbox') {
+                                    el.checked = data.globalSettings[key];
+                                } else {
+                                    el.value = data.globalSettings[key];
+                                }
+                            }
+                        });
+                        functionRules = data.functionRules || {};
+                        saveFunctionRules();
+                        updateFunctionList();
+                        autoFormat();
+                        updateStatus();
+                        showNotification('↑ Settings imported');
+                    } catch (err) {
+                        showNotification('⚠️ Invalid settings file');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function showNotification(msg) {
+            const notif = document.getElementById('notification');
+            notif.textContent = msg;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 2000);
+        }
+
+        const resizer = document.getElementById('resizer');
+        let isResizing = false;
+
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            resizingElement = document.querySelector('.editor-section');
+            resizer.classList.add('active');
+            document.body.style.userSelect = 'none';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing || !resizingElement) return;
+            
+            const rect = resizingElement.getBoundingClientRect();
+            
+            const leftPanel = document.querySelector('.left-panel');
+            const rightPanel = document.querySelector('.right-panel');
+            
+            if (userLayoutPreference === 'horizontal') {
+                const newWidth = e.clientX - rect.left;
+                const percentage = (newWidth / rect.width) * 100;
+                
+                if (percentage > 20 && percentage < 80) {
+                    leftPanel.style.flex = `0 0 ${percentage}%`;
+                    rightPanel.style.flex = `0 0 ${100 - percentage}%`;
+                }
+            } else {
+                const newHeight = e.clientY - rect.top;
+                const percentage = (newHeight / rect.height) * 100;
+                
+                if (percentage > 20 && percentage < 80) {
+                    leftPanel.style.flex = `0 0 ${percentage}%`;
+                    rightPanel.style.flex = `0 0 ${100 - percentage}%`;
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                resizingElement = null;
+                resizer.classList.remove('active');
+                document.body.style.userSelect = '';
+            }
+        });
+
+        function formatCode() {
+            const input = document.getElementById('input').value;
+            if (!input.trim()) {
+                document.getElementById('output').value = '';
+                detectedFunctions.clear();
+                updateFunctionList();
+                return;
+            }
+            
+            const settings = getSettings();
+            const formatted = formatPowerFX(input, settings);
+            document.getElementById('output').value = formatted;
+            updateFunctionList();
+        }
+
+        function formatPowerFX(code, settings) {
+            detectedFunctions.clear();
+            let result = '';
+            let depth = 0;
+            let i = 0;
+            let inString = false;
+            let stringChar = '';
+            let lastWasNewline = true;
+            let lastWasSemicolon = false;
+            let currentFunction = '';
+            let paramCount = 0;
+            
+            const indent = () => ' '.repeat(depth * settings.indentSize);
+            const mathOps = ['+', '-', '*', '/'];
+            
+            const addLine = (text, forceIndent = false) => {
+                if (lastWasNewline || forceIndent) {
+                    result += indent() + text.trim();
+                } else {
+                    result += text;
+                }
+                lastWasNewline = false;
+            };
+            
+            const newLine = () => {
+                if (!lastWasNewline) {
+                    result += '\n';
+                    lastWasNewline = true;
+                }
+            };
+            
+            while (i < code.length) {
+                const char = code[i];
+                const nextChar = code[i + 1] || '';
+                
+                if ((char === '"' || char === "'") && !inString) {
+                    inString = true;
+                    stringChar = char;
+                    addLine(char);
+                    i++;
+                    continue;
+                } else if (char === stringChar && inString) {
+                    if (code[i - 1] !== '\\' || code[i - 2] === '\\') {
+                        inString = false;
+                        addLine(char);
+                        i++;
+                        continue;
+                    }
+                }
+                
+                if (inString) {
+                    addLine(char);
+                    i++;
+                    continue;
+                }
+                
+                if (char === '/' && nextChar === '/') {
+                    let comment = '';
+                    while (i < code.length && code[i] !== '\n') {
+                        comment += code[i];
+                        i++;
+                    }
+                    if (!lastWasNewline) newLine();
+                    result += indent() + comment.trim();
+                    newLine();
+                    continue;
+                }
+                
+                if (char === ' ' || char === '\t' || char === '\r' || char === '\n') {
+                    if (!lastWasNewline && result.slice(-1) !== ' ' && nextChar.trim()) {
+                        addLine(' ');
+                    }
+                    i++;
+                    continue;
+                }
+                
+                if ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || char === '_') {
+                    let funcName = '';
+                    let tempI = i;
+                    while (tempI < code.length && ((code[tempI] >= 'a' && code[tempI] <= 'z') || (code[tempI] >= 'A' && code[tempI] <= 'Z') || code[tempI] === '_' || (code[tempI] >= '0' && code[tempI] <= '9'))) {
+                        funcName += code[tempI];
+                        tempI++;
+                    }
+                    
+                    let checkI = tempI;
+                    while (checkI < code.length && (code[checkI] === ' ' || code[checkI] === '\t')) {
+                        checkI++;
+                    }
+                    
+                    if (checkI < code.length && code[checkI] === '(') {
+                        currentFunction = funcName;
+                        detectedFunctions.add(funcName);
+                        paramCount = 0;
+                    }
+                    
+                    addLine(funcName);
+                    i = tempI;
+                    continue;
+                }
+                
+                if (char === '(') {
+                    const rule = functionRules[currentFunction];
+                    paramCount = 0;
+                    
+                    if (settings.spaceBeforeParen && result.slice(-1) !== ' ' && result.trim()) {
+                        addLine(' ');
+                    }
+                    addLine(char);
+                    
+                    if (rule?.openParenNewline || settings.openParenNewline) {
+                        newLine();
+                    }
+                    
+                    if ((rule?.indentParams || settings.indentParams) && (rule?.oneParamPerLine || settings.oneParamPerLine)) {
+                        depth++;
+                    }
+                    i++;
+                    continue;
+                }
+                
+                if (char === ')') {
+                    const rule = functionRules[currentFunction];
+                    
+                    if ((rule?.indentParams || settings.indentParams) && (rule?.oneParamPerLine || settings.oneParamPerLine)) {
+                        depth--;
+                    }
+                    
+                    if ((rule?.closeParenNewline || settings.closeParenNewline) && !lastWasNewline) {
+                        newLine();
+                    }
+                    addLine(char, rule?.closeParenNewline || settings.closeParenNewline);
+                    currentFunction = '';
+                    i++;
+                    continue;
+                }
+                
+                if (char === '{') {
+                    const rule = functionRules[currentFunction];
+                    const spaceBeforeBrace = rule?.spaceBeforeBrace ?? settings.spaceBeforeBrace;
+                    const openBraceNewline = rule?.openBraceNewline ?? settings.openBraceNewline;
+                    const indentBraceContent = rule?.indentBraceContent ?? settings.indentBraceContent;
+
+                    if (spaceBeforeBrace && result.slice(-1) !== ' ' && result.trim()) {
+                        addLine(' ');
+                    }
+                    addLine(char);
+                    if (openBraceNewline) {
+                        newLine();
+                    }
+                    if (indentBraceContent) {
+                        depth++;
+                    }
+                    i++;
+                    continue;
+                }
+                
+                if (char === '}') {
+                    const rule = functionRules[currentFunction];
+                    const indentBraceContent = rule?.indentBraceContent ?? settings.indentBraceContent;
+                    const closeBraceNewline = rule?.closeBraceNewline ?? settings.closeBraceNewline;
+
+                    if (indentBraceContent) {
+                        depth--;
+                    }
+                    if (closeBraceNewline && !lastWasNewline) {
+                        newLine();
+                    }
+                    addLine(char, closeBraceNewline);
+                    if (settings.extraLinesAfterBraces) {
+                        newLine();
+                    }
+                    i++;
+                    continue;
+                }
+                
+                if (char === ',') {
+                    const rule = functionRules[currentFunction];
+                    paramCount++;
+                    addLine(char);
+                    
+                    const style = (rule?.commaStyle && rule.commaStyle !== '') ? rule.commaStyle : (settings.commaStyle || 'space');
+                    const hasSpace = style === 'space' || style === 'both';
+                    const hasBreak = style === 'break' || style === 'both';
+                    
+                    if (rule?.oneParamPerLine || settings.oneParamPerLine) {
+                        newLine();
+                    } else if (rule?.breakAfterFirstParam && paramCount === 1) {
+                        newLine();
+                    } else if ((rule?.paramOnSameLine !== false) || settings.paramOnSameLine) {
+                        if (hasSpace) addLine(' ');
+                        if (hasBreak) newLine();
+                    } else {
+                        newLine();
+                    }
+                    i++;
+                    continue;
+                }
+                
+                if (char === ';') {
+                    addLine(char);
+                    lastWasSemicolon = true;
+                    if (settings.semicolonNewline) {
+                        newLine();
+                        if (settings.extraLinesBetweenStatements && depth === 0) newLine();
+                    } else {
+                        if (settings.spaceAfterComma) addLine(' ');
+                    }
+                    currentFunction = '';
+                    i++;
+                    continue;
+                }
+                
+                if (settings.operatorSpacing) {
+                    const allOps = ['&&', '||', '>=', '<=', '<>', '!=', '==', '=', '<', '>', '+', '-', '*', '/', '&'];
+                    let found = false;
+                    for (const op of allOps) {
+                        if (code.substr(i, op.length) === op) {
+                            if (settings.keepMathOperatorsTogether && mathOps.includes(op)) {
+                                if (result.slice(-1) !== ' ') addLine(' ');
+                                addLine(op);
+                                addLine(' ');
+                            } else {
+                                if (result.slice(-1) !== ' ') addLine(' ');
+                                addLine(op);
+                                if (settings.operatorNewLine) {
+                                    newLine();
+                                } else {
+                                    addLine(' ');
+                                }
+                            }
+                            i += op.length;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found) {
+                        continue;
+                    }
+                }
+                
+                addLine(char);
+                i++;
+            }
+            
+            result = result.split('\n').map(line => line.trimEnd()).join('\n');
+            result = result.replace(/\n{3,}/g, '\n\n');
+            return result.trim();
+        }
+
+        async function copyToClipboard() {
+            const output = document.getElementById('output');
+            if (!output.value.trim()) {
+                showNotification('⚠️ Nothing to copy');
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(output.value);
+                showNotification('✓ Copied');
+            } catch (err) {
+                output.select();
+                document.execCommand('copy');
+                showNotification('✓ Copied');
+            }
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('input').value = text;
+                showNotification('✓ Pasted');
+            } catch (err) {
+                showNotification('⚠️ Paste denied. Use Ctrl+V');
+            }
+        }
+
+        function copyOutputToInput() {
+            const output = document.getElementById('output').value;
+            if (!output.trim()) {
+                showNotification('⚠️ Nothing to copy');
+                return;
+            }
+            document.getElementById('input').value = output;
+            showNotification('✓ Copied to input');
+        }
+
+        function clearInput() {
+            document.getElementById('input').value = '';
+        }
+
+        function clearOutput() {
+            document.getElementById('output').value = '';
+        }
+
+        // Add event listeners for all settings to trigger autoFormat on change
+        const settingElements = document.querySelectorAll('input[type="checkbox"], input[type="number"], select');
+        settingElements.forEach(el => {
+            if (el.id && el.id !== 'input' && el.id !== 'output') {
+                el.addEventListener('change', () => {
+                    markModified();
+                    autoFormat();
+                });
+            }
+        });
+
+        document.getElementById('input').addEventListener('input', autoFormat);
+        document.getElementById('input').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') formatCode();
+            if (e.ctrlKey && e.key === ',') {
+                e.preventDefault();
+                toggleSettingsPanel();
+            }
+        });
+    </script>
+</body>
+</html>
