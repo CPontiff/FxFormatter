@@ -485,11 +485,21 @@
         }
         .line-gutter .line-number {
             line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding-right: 2px;
         }
         .theme-dark .line-gutter {
             background: #2d3748;
             border-color: #4a5568;
             color: #a0aec0;
+        }
+        .editor-wrapper.hide-line-numbers .line-gutter {
+            display: none;
+        }
+        .editor-wrapper.hide-line-numbers textarea {
+            width: 100%;
         }
         .button-group {
             display: flex;
@@ -1465,6 +1475,13 @@
                                         </div>
                                         <div class="hint">Disable to tweak options freely, then press Format when ready.</div>
                                     </div>
+                                    <div class="setting-item">
+                                        <div class="toggle-row">
+                                            <input type="checkbox" id="showLineNumbers" checked onchange="toggleLineNumbersVisibility()">
+                                            <label for="showLineNumbers">Show line numbers</label>
+                                        </div>
+                                        <div class="hint">Hide gutters for distraction-free editing.</div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -1996,8 +2013,10 @@
         let resizingElement = null;
         let selectedFunction = null;
         let liveFormattingEnabled = true;
+        let lineNumbersVisible = true;
         const CARD_ORDER_KEY = 'powerFxCardOrder';
         let draggingCard = null;
+        const lineMeasureElements = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             loadPreferences();
@@ -2013,6 +2032,7 @@
 
         window.addEventListener('resize', () => {
             updateLayoutDisplay();
+            refreshAllLineNumbers();
         });
 
         function toggleSection(el) {
@@ -2034,6 +2054,7 @@
             const fontSize = localStorage.getItem('powerFxFontSize') || 'medium';
             const livePref = localStorage.getItem('powerFxLiveFormatting');
             const inputCollapsed = localStorage.getItem('powerFxInputCollapsed') === 'true';
+            const showLineNumbersPref = localStorage.getItem('powerFxShowLineNumbers');
 
             if (theme === 'dark') {
                 document.body.classList.add('theme-dark');
@@ -2053,6 +2074,11 @@
             liveFormattingEnabled = livePref !== 'false';
             const liveToggle = document.getElementById('liveFormatting');
             if (liveToggle) liveToggle.checked = liveFormattingEnabled;
+
+            lineNumbersVisible = showLineNumbersPref !== 'false';
+            const lineNumberToggle = document.getElementById('showLineNumbers');
+            if (lineNumberToggle) lineNumberToggle.checked = lineNumbersVisible;
+            applyLineNumberVisibility();
         }
 
         function loadFunctionRules() {
@@ -2344,6 +2370,7 @@
                 ta.classList.add(`font-${size}`);
             });
             localStorage.setItem('powerFxFontSize', size);
+            refreshAllLineNumbers();
         }
 
         function setWidth(width) {
@@ -2355,6 +2382,21 @@
                 container.style.width = width;
                 showNotification(`↔️ Width: ${width}`);
             }
+            refreshAllLineNumbers();
+        }
+
+        function applyLineNumberVisibility() {
+            document.querySelectorAll('.editor-wrapper').forEach(wrapper => {
+                wrapper.classList.toggle('hide-line-numbers', !lineNumbersVisible);
+            });
+            refreshAllLineNumbers();
+        }
+
+        function toggleLineNumbersVisibility() {
+            lineNumbersVisible = document.getElementById('showLineNumbers').checked;
+            localStorage.setItem('powerFxShowLineNumbers', lineNumbersVisible);
+            applyLineNumberVisibility();
+            showNotification(lineNumbersVisible ? '🔢 Line numbers shown' : '👁️‍🗨️ Line numbers hidden');
         }
 
         function toggleLiveFormatting() {
@@ -2736,13 +2778,61 @@
             setTimeout(() => notif.classList.remove('show'), 2000);
         }
 
+        function getLineMeasureElement(areaId, textarea) {
+            if (!lineMeasureElements[areaId]) {
+                const measure = document.createElement('div');
+                measure.style.position = 'absolute';
+                measure.style.visibility = 'hidden';
+                measure.style.whiteSpace = 'pre-wrap';
+                measure.style.wordBreak = 'break-word';
+                measure.style.top = '-9999px';
+                measure.style.left = '-9999px';
+                measure.style.padding = '0';
+                measure.style.margin = '0';
+                measure.style.border = '0';
+                measure.style.boxSizing = 'border-box';
+                document.body.appendChild(measure);
+                lineMeasureElements[areaId] = measure;
+            }
+
+            const measure = lineMeasureElements[areaId];
+            const style = window.getComputedStyle(textarea);
+            const paddingLeft = parseFloat(style.paddingLeft) || 0;
+            const paddingRight = parseFloat(style.paddingRight) || 0;
+            const contentWidth = Math.max(0, textarea.clientWidth - paddingLeft - paddingRight);
+            const wrapMode = textarea.getAttribute('wrap') || textarea.wrap || 'soft';
+            measure.style.fontFamily = style.fontFamily;
+            measure.style.fontSize = style.fontSize;
+            measure.style.lineHeight = style.lineHeight;
+            measure.style.width = `${contentWidth}px`;
+            measure.style.whiteSpace = wrapMode === 'off' ? 'pre' : 'pre-wrap';
+            measure.style.wordBreak = wrapMode === 'off' ? 'normal' : 'break-word';
+            return measure;
+        }
+
         function updateLineNumbers(areaId, gutterId) {
             const textarea = document.getElementById(areaId);
             const gutter = document.getElementById(gutterId);
             if (!textarea || !gutter) return;
-            const lines = textarea.value.split('\n').length || 1;
-            const html = Array.from({ length: lines }, (_, i) => `<div class="line-number">${i + 1}</div>`).join('');
-            gutter.innerHTML = html;
+
+            if (!lineNumbersVisible) {
+                gutter.innerHTML = '';
+                return;
+            }
+
+            const style = window.getComputedStyle(textarea);
+            const lineHeight = parseFloat(style.lineHeight) || 16;
+            const measure = getLineMeasureElement(areaId, textarea);
+
+            const lines = textarea.value.split('\n');
+            const html = lines.map((line, i) => {
+                measure.textContent = line || ' ';
+                const rows = Math.max(1, Math.ceil(measure.scrollHeight / lineHeight));
+                const height = rows * lineHeight;
+                return `<div class="line-number" style="height:${height}px">${i + 1}</div>`;
+            }).join('');
+
+            gutter.innerHTML = html || '<div class="line-number">1</div>';
             gutter.scrollTop = textarea.scrollTop;
         }
 
@@ -2813,6 +2903,7 @@
                 resizingElement = null;
                 resizer.classList.remove('active');
                 document.body.style.userSelect = '';
+                refreshAllLineNumbers();
             }
         });
 
