@@ -207,93 +207,55 @@
         .theme-dark .style-label {
             color: #e2e8f0;
         }
-        .style-buttons {
+        .style-select-wrap {
             display: flex;
-            gap: 6px;
+            align-items: center;
+            gap: 10px;
             flex-wrap: wrap;
+            flex: 1;
         }
-        .style-btn {
-            padding: 5px 12px;
+        .style-select {
+            padding: 7px 10px;
             border: 2px solid #cbd5e0;
-            background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 500;
-            transition: all 0.2s;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
             color: #4a5568;
-            flex-shrink: 0;
-            position: relative;
-        }
-        .theme-dark .style-btn {
-            background: #4a5568;
-            border-color: #718096;
-            color: #e2e8f0;
-        }
-        .style-btn:hover {
-            border-color: #667eea;
-        }
-        .style-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        .style-btn.modified::after {
-            content: '•';
-            position: absolute;
-            top: 0;
-            right: 4px;
-            color: #f56565;
-            font-size: 16px;
-        }
-        .custom-presets {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            padding-top: 6px;
-            border-top: 1px solid #cbd5e0;
-            margin-top: 6px;
-        }
-        .theme-dark .custom-presets {
-            border-top-color: #4a5568;
-        }
-        .custom-preset {
-            padding: 5px 12px;
-            border: 2px dashed #cbd5e0;
             background: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 500;
-            transition: all 0.2s;
-            color: #4a5568;
-            flex-shrink: 0;
-            position: relative;
+            min-width: 220px;
         }
-        .theme-dark .custom-preset {
+        .theme-dark .style-select {
             background: #2d3748;
             border-color: #4a5568;
-            color: #a0aec0;
+            color: #e2e8f0;
         }
-        .custom-preset:hover {
-            border-color: #48bb78;
-            color: #48bb78;
+        .style-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 200px;
         }
-        .theme-dark .custom-preset:hover {
-            color: #68d391;
+        .style-meta .microcopy {
+            font-size: 10px;
+            color: #718096;
         }
-        .custom-preset.active {
-            background: #48bb78;
-            color: white;
-            border-color: #48bb78;
-        }
-        .modified-indicator {
-            position: absolute;
-            top: 0;
-            right: 4px;
-            color: #f56565;
-            font-size: 12px;
+        .theme-dark .style-meta .microcopy { color: #a0aec0; }
+        .style-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid #cbd5e0;
+            background: #f7fafc;
+            color: #4a5568;
+            font-size: 10px;
             font-weight: 700;
+        }
+        .theme-dark .style-status-pill {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: #e2e8f0;
         }
         .save-default-btn {
             padding: 5px 12px;
@@ -799,6 +761,49 @@
             opacity: 1;
             pointer-events: auto;
         }
+        .hint-icon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            margin-left: 6px;
+            border-radius: 50%;
+            background: #edf2f7;
+            color: #4a5568;
+            font-size: 10px;
+            cursor: default;
+            flex-shrink: 0;
+        }
+        .theme-dark .hint-icon { background: #3a4a5a; color: #e2e8f0; }
+        .hint-popover {
+            position: absolute;
+            top: 22px;
+            left: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            padding: 8px 10px;
+            width: 240px;
+            font-size: 10px;
+            line-height: 1.5;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease;
+            z-index: 5;
+        }
+        .theme-dark .hint-popover { background: #1a202c; border-color: #4a5568; color: #e2e8f0; }
+        .hint-icon:hover .hint-popover {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .label-with-hint {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
         .card-body {
             display: flex;
             flex-direction: column;
@@ -1295,16 +1300,12 @@
         
         <div class="styles-bar">
             <span class="style-label">Style:</span>
-            <div class="style-buttons">
-                <button class="style-btn active" data-style="ultra-compact">Ultra Compact</button>
-                <button class="style-btn" data-style="compact">Compact</button>
-                <button class="style-btn" data-style="balanced">Balanced</button>
-                <button class="style-btn" data-style="readable">Readable</button>
-                <button class="style-btn" data-style="python-style">Python-like</button>
-                <button class="style-btn" data-style="javascript-style">JS-like</button>
-                <button class="style-btn" data-style="csharp-style">C#-like</button>
-                <button class="style-btn" data-style="sql-style">SQL-like</button>
-                <button class="style-btn" data-style="one-liner">One-Liner</button>
+            <div class="style-select-wrap">
+                <select id="styleSelect" class="style-select" onchange="handleStyleChange(this.value)"></select>
+                <div class="style-meta">
+                    <span class="style-status-pill" id="styleStatus">Default preset</span>
+                    <span class="microcopy">Hover a setting to see an example. Custom presets appear automatically when you tweak a style.</span>
+                </div>
             </div>
             <button class="save-default-btn" onclick="saveAsDefault()">💾 Save</button>
         </div>
@@ -1572,20 +1573,40 @@
                                 <div class="card-body setting-stack">
                                     <div class="setting-item toggle-row">
                                         <input type="checkbox" id="paramOnSameLine" checked onchange="markModified(); autoFormat()">
-                                        <label for="paramOnSameLine">Params on same line</label>
+                                        <div class="label-with-hint">
+                                            <label for="paramOnSameLine">Params on same line</label>
+                                            <span class="hint-icon" aria-label="Show example for params on same line">?
+                                                <div class="hint-popover"><strong>Inline arguments</strong><br>Function and first argument stay together: <code>Sum(value1, value2)</code>. Disable to drop arguments to the next line.</div>
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="setting-item toggle-row">
                                         <input type="checkbox" id="breakAfterFirstParam" onchange="markModified(); autoFormat()">
-                                        <label for="breakAfterFirstParam">Break after 1st param</label>
+                                        <div class="label-with-hint">
+                                            <label for="breakAfterFirstParam">Break after 1st param</label>
+                                            <span class="hint-icon" aria-label="Show example for breaking after first param">?
+                                                <div class="hint-popover"><strong>Hanging list</strong><br>Keep the first argument with the function name, then wrap: <code>Patch(record,<br>&nbsp;&nbsp;change1,<br>&nbsp;&nbsp;change2)</code>.</div>
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="hint">Keep the first argument with the function name, drop the rest underneath.</div>
                                     <div class="setting-item toggle-row">
                                         <input type="checkbox" id="oneParamPerLine" onchange="markModified(); autoFormat()">
-                                        <label for="oneParamPerLine">One param per line</label>
+                                        <div class="label-with-hint">
+                                            <label for="oneParamPerLine">One param per line</label>
+                                            <span class="hint-icon" aria-label="Show example for one param per line">?
+                                                <div class="hint-popover"><strong>Stacked parameters</strong><br>Each argument sits on its own line for diff-friendly changes: <code>Filter(<br>&nbsp;&nbsp;source,<br>&nbsp;&nbsp;condition1,<br>&nbsp;&nbsp;condition2<br>)</code>.</div>
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="setting-item toggle-row">
                                         <input type="checkbox" id="trailingComma" onchange="markModified(); autoFormat()">
-                                        <label for="trailingComma">Trailing comma on last param</label>
+                                        <div class="label-with-hint">
+                                            <label for="trailingComma">Trailing comma on last param</label>
+                                            <span class="hint-icon" aria-label="Show example for trailing comma">?
+                                                <div class="hint-popover"><strong>Diff-safe endings</strong><br>Add a comma after the final argument so future edits only change one line: <code>Collect(<br>&nbsp;&nbsp;source,<br>&nbsp;&nbsp;payload,<br>)</code>.</div>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2036,6 +2057,7 @@
         let detectedFunctions = new Set();
         let presetSettings = {};
         let isModified = false;
+        let autoPresetCaptured = false;
         let resizingElement = null;
         let selectedFunction = null;
         let liveFormattingEnabled = true;
@@ -2046,8 +2068,9 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             loadPreferences();
-            setupStyleButtons();
-            applyStyle('ultra-compact');
+            setupStyleSelector();
+            const savedStyle = localStorage.getItem('powerFxDefaultStyle') || 'ultra-compact';
+            applyStyle(savedStyle);
             updateLayoutDisplay();
             loadFunctionRules();
             updateStatus();
@@ -2121,16 +2144,20 @@
 
         function saveCustomPreset(name, settings) {
             const customPresets = loadCustomPresets();
-            customPresets[name] = settings;
+            customPresets[name] = {
+                ...settings,
+                name: settings.name || name,
+                description: settings.description || 'Custom preset',
+            };
             localStorage.setItem('powerFxCustomPresets', JSON.stringify(customPresets));
-            rebuildStyleButtons();
+            rebuildStyleSelector();
         }
 
         function deleteCustomPreset(name) {
             const customPresets = loadCustomPresets();
             delete customPresets[name];
             localStorage.setItem('powerFxCustomPresets', JSON.stringify(customPresets));
-            rebuildStyleButtons();
+            rebuildStyleSelector();
         }
 
         function compareSettings(saved, current) {
@@ -2156,69 +2183,75 @@
             localStorage.setItem('powerFxFunctionRules', JSON.stringify(functionRules));
         }
 
-        function rebuildStyleButtons() {
-            const container = document.querySelector('.style-buttons');
-            if (!container) return;
-            
-            // Keep default presets
-            Array.from(container.querySelectorAll('.style-btn')).forEach(btn => {
-                if (!btn.dataset.custom) {
-                    btn.addEventListener('click', () => {
-                        const style = btn.dataset.style;
-                        applyStyle(style);
-                    });
-                }
-            });
-            
-            // Add custom presets
+        function rebuildStyleSelector(selected = null) {
+            const select = document.getElementById('styleSelect');
+            if (!select) return;
+
             const customPresets = loadCustomPresets();
-            const customContainer = container.querySelector('.custom-presets') || 
-                (() => {
-                    const div = document.createElement('div');
-                    div.className = 'custom-presets';
-                    container.appendChild(div);
-                    return div;
-                })();
-            
-            customContainer.innerHTML = '';
-            Object.entries(customPresets).forEach(([name, settings]) => {
-                const btn = document.createElement('button');
-                btn.className = 'style-btn custom-preset';
-                btn.dataset.style = name;
-                btn.dataset.custom = 'true';
-                btn.innerHTML = `${name} <span class="modified-indicator" style="display:none;">●</span>`;
-                
-                btn.addEventListener('click', () => {
-                    applyStyle(name, settings);
-                });
-                
-                // Right-click to delete
-                btn.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    if (confirm(`Delete custom preset "${name}"?`)) {
-                        deleteCustomPreset(name);
-                    }
-                });
-                
-                customContainer.appendChild(btn);
+            select.innerHTML = '';
+
+            const defaults = document.createElement('optgroup');
+            defaults.label = 'Default styles';
+            Object.entries(STYLE_PRESETS).forEach(([key, preset]) => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = preset.name;
+                defaults.appendChild(option);
             });
+            select.appendChild(defaults);
+
+            const customKeys = Object.keys(customPresets);
+            if (customKeys.length) {
+                const customGroup = document.createElement('optgroup');
+                customGroup.label = 'Custom presets';
+                customKeys.forEach(key => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = customPresets[key].name || key;
+                    option.dataset.custom = 'true';
+                    customGroup.appendChild(option);
+                });
+                select.appendChild(customGroup);
+            }
+
+            const toSelect = selected || currentStyle || 'ultra-compact';
+            const hasOption = Array.from(select.options).some(opt => opt.value === toSelect);
+            select.value = hasOption ? toSelect : 'ultra-compact';
         }
 
-        function setupStyleButtons() {
-            rebuildStyleButtons();
+        function setupStyleSelector() {
+            rebuildStyleSelector('ultra-compact');
+        }
+
+        function resolvePreset(styleName) {
+            const customPresets = loadCustomPresets();
+            return customPresets[styleName] || STYLE_PRESETS[styleName];
+        }
+
+        function handleStyleChange(styleName) {
+            const preset = resolvePreset(styleName);
+            applyStyle(styleName, preset);
         }
 
         function applyStyle(styleName, customPreset = null) {
-            let preset = customPreset || STYLE_PRESETS[styleName];
+            const preset = customPreset || resolvePreset(styleName);
             if (!preset) return;
-            
+
             currentStyle = styleName;
             presetSettings = { ...preset };
             isModified = false;
-            
+            autoPresetCaptured = false;
+
             document.getElementById('styleDescription').textContent = preset.description || styleName;
             document.getElementById('activeStyleBadge').textContent = preset.name || styleName;
-            
+            const customPresets = loadCustomPresets();
+            document.getElementById('styleStatus').textContent = customPresets[styleName] ? 'Custom preset' : 'Default preset';
+
+            const select = document.getElementById('styleSelect');
+            if (select) {
+                rebuildStyleSelector(styleName);
+            }
+
             // Apply all settings from preset
             Object.keys(preset).forEach(key => {
                 const el = document.getElementById(key);
@@ -2232,27 +2265,47 @@
                     }
                 }
             });
-            
-            document.querySelectorAll('.style-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.style === styleName);
-                btn.classList.remove('modified');
-                const indicator = btn.querySelector('.modified-indicator');
-                if (indicator) indicator.style.display = 'none';
-            });
-            
+
             updateStatus();
             autoFormat(true);
         }
 
         function markModified() {
             isModified = true;
-            const activeBtn = document.querySelector(`.style-btn.active`);
-            if (activeBtn) {
-                activeBtn.classList.add('modified');
-                const indicator = activeBtn.querySelector('.modified-indicator');
-                if (indicator) indicator.style.display = 'inline';
-            }
+            persistAutoPreset();
             updateStatus();
+        }
+
+        function persistAutoPreset() {
+            const settings = getSettings();
+            const customPresets = loadCustomPresets();
+            const isCustom = Boolean(customPresets[currentStyle]);
+            const preset = resolvePreset(currentStyle);
+
+            if (!preset) return;
+
+            if (!isCustom && !autoPresetCaptured) {
+                const baseName = preset.name || currentStyle;
+                const customKey = `${currentStyle}-custom`;
+                const payload = {
+                    ...settings,
+                    name: `${baseName} (custom)`,
+                    description: 'Auto-saved from ' + baseName,
+                };
+                saveCustomPreset(customKey, payload);
+                currentStyle = customKey;
+                presetSettings = { ...payload };
+                autoPresetCaptured = true;
+                rebuildStyleSelector(customKey);
+                const select = document.getElementById('styleSelect');
+                if (select) select.value = customKey;
+                document.getElementById('activeStyleBadge').textContent = payload.name;
+                document.getElementById('styleDescription').textContent = payload.description;
+                document.getElementById('styleStatus').textContent = 'Custom preset (auto)';
+            } else if (isCustom) {
+                saveCustomPreset(currentStyle, { ...preset, ...settings });
+                document.getElementById('styleStatus').textContent = 'Custom preset';
+            }
         }
 
         function getSettings() {
@@ -2462,7 +2515,8 @@
         }
 
         function updateStatus() {
-            document.getElementById('statusStyle').textContent = STYLE_PRESETS[currentStyle].name;
+            const preset = resolvePreset(currentStyle) || {};
+            document.getElementById('statusStyle').textContent = preset.name || currentStyle;
             document.getElementById('statusModified').textContent = isModified ? '✓ Custom' : 'No';
             document.getElementById('statusFuncRules').textContent = Object.keys(functionRules).length;
             updateDiagnostics();
@@ -2971,9 +3025,9 @@
             let lastWasNewline = true;
             let lastWasSemicolon = false;
             let currentFunction = '';
-            let paramCount = 0;
             let braceDepth = 0;
             let parenDepth = 0;
+            const paramInfoStack = [];
             
             const indent = () => ' '.repeat(depth * settings.indentSize);
             const mathOps = ['+', '-', '*', '/'];
@@ -3038,7 +3092,11 @@
                     i++;
                     continue;
                 }
-                
+
+                if (paramInfoStack.length && char.trim() && ![')', '(', '{', '}', ',', ';'].includes(char)) {
+                    paramInfoStack[paramInfoStack.length - 1].hasParam = true;
+                }
+
                 if ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || char === '_') {
                     let funcName = '';
                     let tempI = i;
@@ -3055,7 +3113,6 @@
                     if (checkI < code.length && code[checkI] === '(') {
                         currentFunction = funcName;
                         detectedFunctions.add(funcName);
-                        paramCount = 0;
                     }
                     
                     addLine(funcName);
@@ -3065,19 +3122,40 @@
                 
                 if (char === '(') {
                     const rule = functionRules[currentFunction];
-                    paramCount = 0;
                     parenDepth++;
-                    
+
+                    const paramOnSameLine = rule?.paramOnSameLine ?? settings.paramOnSameLine;
+                    const indentParams = rule?.indentParams ?? settings.indentParams;
+                    const onePerLine = rule?.oneParamPerLine ?? settings.oneParamPerLine;
+                    const breakAfterFirst = rule?.breakAfterFirstParam ?? settings.breakAfterFirstParam;
+
+                    const shouldIndentParams = indentParams && (!paramOnSameLine || onePerLine || breakAfterFirst);
+
+                    paramInfoStack.push({
+                        shouldIndentParams,
+                        paramOnSameLine,
+                        onePerLine,
+                        breakAfterFirst,
+                        trailingComma: rule?.trailingComma ?? settings.trailingComma,
+                        hasParam: false,
+                        commaCount: 0,
+                    });
+
                     if (settings.spaceBeforeParen && result.slice(-1) !== ' ' && result.trim()) {
                         addLine(' ');
                     }
                     addLine(char);
-                    
-                    if (rule?.openParenNewline || settings.openParenNewline) {
+
+                    const openParenBreak = rule?.openParenNewline || settings.openParenNewline;
+                    if (openParenBreak) {
                         newLine();
                     }
-                    
-                    if ((rule?.indentParams || settings.indentParams) && (rule?.oneParamPerLine || settings.oneParamPerLine)) {
+
+                    if (!paramOnSameLine && !openParenBreak) {
+                        newLine();
+                    }
+
+                    if (shouldIndentParams) {
                         depth++;
                     }
                     i++;
@@ -3086,13 +3164,25 @@
                 
                 if (char === ')') {
                     const rule = functionRules[currentFunction];
+                    const paramInfo = paramInfoStack.pop() || {};
 
                     parenDepth = Math.max(0, parenDepth - 1);
-                    
-                    if ((rule?.indentParams || settings.indentParams) && (rule?.oneParamPerLine || settings.oneParamPerLine)) {
+
+                    if (paramInfo.shouldIndentParams) {
                         depth--;
                     }
-                    
+
+                    const needsTrailingComma = (paramInfo.trailingComma ?? settings.trailingComma) && paramInfo.hasParam;
+                    const trimmed = result.trimEnd();
+                    const endsWithComma = trimmed.endsWith(',');
+
+                    if (needsTrailingComma && !endsWithComma && !trimmed.endsWith('(')) {
+                        addLine(',');
+                        if (paramInfo.onePerLine || paramInfo.breakAfterFirst) {
+                            newLine();
+                        }
+                    }
+
                     if ((rule?.closeParenNewline || settings.closeParenNewline) && !lastWasNewline) {
                         newLine();
                     }
@@ -3145,7 +3235,11 @@
                 
                 if (char === ',') {
                     const rule = functionRules[currentFunction];
-                    paramCount++;
+                    const paramInfo = paramInfoStack[paramInfoStack.length - 1];
+                    if (paramInfo) {
+                        paramInfo.hasParam = true;
+                        paramInfo.commaCount += 1;
+                    }
                     addLine(char);
 
                     const style = (rule?.commaStyle && rule.commaStyle !== '') ? rule.commaStyle : (settings.commaStyle || 'space');
@@ -3154,13 +3248,17 @@
                     const insideBlock = braceDepth > 0 || parenDepth > 0;
                     const blockBreak = settings.blockCommaNewline && insideBlock;
 
-                    if (rule?.oneParamPerLine || settings.oneParamPerLine) {
+                    const onePerLine = paramInfo?.onePerLine ?? rule?.oneParamPerLine ?? settings.oneParamPerLine;
+                    const breakAfterFirst = paramInfo?.breakAfterFirst ?? rule?.breakAfterFirstParam ?? settings.breakAfterFirstParam;
+                    const paramOnSameLine = paramInfo?.paramOnSameLine ?? rule?.paramOnSameLine ?? settings.paramOnSameLine;
+
+                    if (onePerLine) {
                         newLine();
-                    } else if (rule?.breakAfterFirstParam && paramCount === 1) {
+                    } else if (breakAfterFirst && paramInfo?.commaCount === 1) {
                         newLine();
                     } else if (blockBreak) {
                         newLine();
-                    } else if ((rule?.paramOnSameLine !== false) || settings.paramOnSameLine) {
+                    } else if (paramOnSameLine) {
                         if (hasSpace) addLine(' ');
                         if (hasBreak) newLine();
                     } else {
