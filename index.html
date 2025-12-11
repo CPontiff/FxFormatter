@@ -102,6 +102,12 @@
             border: 1px solid #1f2937;
             box-shadow: none;
         }
+        button.secondary {
+            background: #111827;
+            color: #e5e7eb;
+            border: 1px solid #1f2937;
+            box-shadow: none;
+        }
         .map-wrap {
             position: relative;
         }
@@ -235,6 +241,83 @@
             border-radius: 10px;
             margin-top: 10px;
         }
+        .designer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+        .designer-grid input,
+        .designer-grid select,
+        .designer-grid button,
+        .designer-grid textarea {
+            width: 100%;
+            background: #0b1222;
+            border: 1px solid #1f2937;
+            color: #e5e7eb;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .designer-grid label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+        .designer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .designer-actions button {
+            flex: 1;
+            min-width: 120px;
+        }
+        .shape-list {
+            display: grid;
+            gap: 8px;
+            max-height: 180px;
+            overflow: auto;
+        }
+        .shape-row {
+            padding: 10px;
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+            background: #0b1222;
+            display: grid;
+            gap: 4px;
+            cursor: pointer;
+        }
+        .shape-row:hover {
+            border-color: #22c55e;
+        }
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #111827;
+            border: 1px solid #1f2937;
+            color: #cbd5e1;
+            font-size: 12px;
+            margin-right: 6px;
+        }
+        .draft-line {
+            fill: none;
+            stroke: #f59e0b;
+            stroke-width: 2px;
+            stroke-dasharray: 4 2;
+        }
+        .custom-territory {
+            stroke: #0b1021;
+            stroke-width: 1.5px;
+            fill-opacity: 0.32;
+        }
+        .poi {
+            fill: #38bdf8;
+            stroke: #0b1021;
+            stroke-width: 1px;
+        }
     </style>
 </head>
 <body>
@@ -286,6 +369,58 @@
                     <p class="muted">Prebuilt address index ships locally. You can also paste lat/lon to drop a point anywhere in the US map.</p>
                     <p class="status" id="status">Ready.</p>
                 </div>
+                <div class="card">
+                    <h3>Territory designer</h3>
+                    <div class="designer-grid">
+                        <div>
+                            <label for="area-name">Area name</label>
+                            <input id="area-name" placeholder="Neighborhood, zone, etc." />
+                        </div>
+                        <div>
+                            <label for="area-owner">Assigned to</label>
+                            <input id="area-owner" placeholder="Owner or team" />
+                        </div>
+                        <div>
+                            <label for="area-days">Working days</label>
+                            <input id="area-days" placeholder="e.g. Mon/Wed/Fri" />
+                        </div>
+                        <div>
+                            <label for="area-label">Label on map</label>
+                            <input id="area-label" placeholder="Short label" />
+                        </div>
+                        <div>
+                            <label for="area-color">Fill color</label>
+                            <input id="area-color" type="color" value="#22c55e" />
+                        </div>
+                        <div>
+                            <label for="area-note">Notes</label>
+                            <textarea id="area-note" rows="2" placeholder="Optional description"></textarea>
+                        </div>
+                        <div>
+                            <label for="pin-label">Point label</label>
+                            <input id="pin-label" placeholder="Point of interest" />
+                        </div>
+                    </div>
+                    <div class="designer-actions">
+                        <button id="start-draw">Start drawing</button>
+                        <button id="finish-draw" class="secondary">Close shape</button>
+                        <button id="cancel-draw" class="secondary">Cancel</button>
+                    </div>
+                    <div class="designer-actions">
+                        <button id="pin-mode" class="secondary">Drop pin</button>
+                        <button id="export-shapes" class="secondary">Export definitions</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Custom areas & pins</h3>
+                    <div class="designer-grid" style="grid-template-columns: 1fr;">
+                        <div>
+                            <label for="shape-filter">Filter by name or owner</label>
+                            <input id="shape-filter" placeholder="Search custom items" />
+                        </div>
+                    </div>
+                    <div class="shape-list" id="shape-list"></div>
+                </div>
                 <div class="card readme">
                     <h3>How to update data</h3>
                     <ol class="muted">
@@ -315,14 +450,41 @@
         const resetBtn = document.getElementById('reset');
         const copyBtn = document.getElementById('copy');
         const datalist = document.getElementById('search-options');
+        const areaNameInput = document.getElementById('area-name');
+        const areaOwnerInput = document.getElementById('area-owner');
+        const areaDaysInput = document.getElementById('area-days');
+        const areaLabelInput = document.getElementById('area-label');
+        const areaColorInput = document.getElementById('area-color');
+        const areaNoteInput = document.getElementById('area-note');
+        const pinLabelInput = document.getElementById('pin-label');
+        const startDrawBtn = document.getElementById('start-draw');
+        const finishDrawBtn = document.getElementById('finish-draw');
+        const cancelDrawBtn = document.getElementById('cancel-draw');
+        const pinModeBtn = document.getElementById('pin-mode');
+        const exportBtn = document.getElementById('export-shapes');
+        const shapeListEl = document.getElementById('shape-list');
+        const shapeFilterInput = document.getElementById('shape-filter');
+
+        const mapGroup = svg.append('g').attr('class', 'map-group');
+        const baseLayer = mapGroup.append('g').attr('class', 'base-layer');
+        const territoryLayer = mapGroup.append('g').attr('class', 'territory-layer');
+        const labelLayer = mapGroup.append('g').attr('class', 'label-layer');
+        const customLayer = mapGroup.append('g').attr('class', 'custom-layer');
+        const pointLayer = mapGroup.append('g').attr('class', 'point-layer');
 
         let projection = d3.geoAlbersUsa().translate([480, 300]).scale(1200);
         let path = d3.geoPath(projection);
         let stateFeatures = [];
         let territoryFeatures = [];
         let addressIndex = [];
-        let pointLayer;
         let selectionData = null;
+        let customAreas = [];
+        let customAreaFeatures = [];
+        let customPins = [];
+        let drawingMode = false;
+        let pinMode = false;
+        let drawingCoords = [];
+        let draftLine = null;
 
         const formatSelection = (data) => {
             if (!data) return 'Nothing selected yet.';
@@ -330,6 +492,7 @@
             lines.push(`<div class="pill">${data.kind}</div>`);
             lines.push(`<strong>${data.name}</strong>`);
             if (data.owner) lines.push(`<div class="muted">Owner: ${data.owner}</div>`);
+            if (data.days) lines.push(`<div class="muted">Days: ${data.days}</div>`);
             if (data.note) lines.push(`<div class="muted">Note: ${data.note}</div>`);
             if (data.point) lines.push(`<div class="muted">Point: ${data.point.lat.toFixed(4)}, ${data.point.lon.toFixed(4)}</div>`);
             if (data.label) lines.push(`<div class="muted">Label: ${data.label}</div>`);
@@ -342,6 +505,7 @@
                 `Type: ${selectionData.kind}`,
                 `Name: ${selectionData.name}`,
                 selectionData.owner ? `Owner: ${selectionData.owner}` : null,
+                selectionData.days ? `Days: ${selectionData.days}` : null,
                 selectionData.note ? `Note: ${selectionData.note}` : null,
                 selectionData.label ? `Label: ${selectionData.label}` : null,
                 selectionData.point ? `Point: ${selectionData.point.lat}, ${selectionData.point.lon}` : null
@@ -350,6 +514,287 @@
                 statusEl.textContent = 'Copied selection to clipboard.';
             });
         };
+
+        const zoom = d3.zoom().scaleExtent([1, 16]).on('zoom', (event) => {
+            mapGroup.attr('transform', event.transform);
+        });
+
+        svg.call(zoom).on('dblclick.zoom', null);
+
+        const getGeoFromEvent = (event) => {
+            const [x, y] = d3.pointer(event, svg.node());
+            const transform = d3.zoomTransform(svg.node());
+            const [tx, ty] = transform.invert([x, y]);
+            return projection.invert([tx, ty]);
+        };
+
+        const clearDraftLine = () => {
+            if (draftLine) {
+                draftLine.remove();
+                draftLine = null;
+            }
+            drawingCoords = [];
+        };
+
+        const updateDraftLine = () => {
+            if (!drawingMode) return;
+            if (!draftLine) {
+                draftLine = customLayer.append('polyline').attr('class', 'draft-line');
+            }
+            const pts = drawingCoords.map(coord => projection(coord).join(',')).join(' ');
+            draftLine.attr('points', pts);
+        };
+
+        const renderCustomArea = (feature) => {
+            const areaPath = customLayer.append('path')
+                .datum(feature)
+                .attr('class', 'territory custom-territory')
+                .attr('id', `custom-area-${feature.properties.id}`)
+                .attr('fill', feature.properties.color)
+                .attr('d', path)
+                .on('click', (event, d) => {
+                    if (drawingMode || pinMode) {
+                        handleInteractiveClick(event);
+                        return;
+                    }
+                    svg.selectAll('.selected').classed('selected', false);
+                    d3.select(event.currentTarget).classed('selected', true);
+                    assignSelection({
+                        kind: 'Custom area',
+                        name: d.properties.name,
+                        owner: d.properties.owner,
+                        label: d.properties.label,
+                        note: d.properties.note,
+                        days: d.properties.days
+                    });
+                });
+
+            labelLayer.append('text')
+                .attr('class', 'territory-label')
+                .attr('id', `custom-label-${feature.properties.id}`)
+                .attr('transform', `translate(${path.centroid(feature)})`)
+                .text(feature.properties.label || feature.properties.name);
+        };
+
+        const renderCustomPin = (pin) => {
+            const [x, y] = projection([pin.lon, pin.lat]) || [];
+            if (!x || !y) return;
+            customLayer.append('circle')
+                .attr('class', 'poi')
+                .attr('id', `custom-pin-${pin.id}`)
+                .attr('r', 5)
+                .attr('cx', x)
+                .attr('cy', y)
+                .on('click', (event) => {
+                    if (drawingMode || pinMode) {
+                        handleInteractiveClick(event);
+                        return;
+                    }
+                    svg.selectAll('.selected').classed('selected', false);
+                    d3.select(event.currentTarget).classed('selected', true);
+                    assignSelection({
+                        kind: 'Point of interest',
+                        name: pin.name,
+                        owner: pin.owner,
+                        note: pin.note,
+                        days: pin.days,
+                        point: { lat: pin.lat, lon: pin.lon }
+                    });
+                });
+        };
+
+        const refreshShapeList = () => {
+            const filter = shapeFilterInput.value.toLowerCase();
+            shapeListEl.innerHTML = '';
+            const rows = [];
+
+            customAreas.forEach(area => {
+                if (filter && !area.name.toLowerCase().includes(filter) && !(area.owner || '').toLowerCase().includes(filter)) return;
+                const div = document.createElement('div');
+                div.className = 'shape-row';
+                div.dataset.id = area.id;
+                div.innerHTML = `<strong>${area.name}</strong>` +
+                    `<div class="muted">${area.owner || 'Unassigned'}</div>` +
+                    `<div>${area.days ? `<span class="tag">${area.days}</span>` : ''}<span class="tag">Area</span></div>`;
+                div.addEventListener('click', () => {
+                    svg.selectAll('.selected').classed('selected', false);
+                    d3.select(`#custom-area-${area.id}`).classed('selected', true);
+                    assignSelection({
+                        kind: 'Custom area',
+                        name: area.name,
+                        owner: area.owner,
+                        days: area.days,
+                        label: area.label,
+                        note: area.note
+                    });
+                });
+                rows.push(div);
+            });
+
+            customPins.forEach(pin => {
+                if (filter && !pin.name.toLowerCase().includes(filter) && !(pin.owner || '').toLowerCase().includes(filter)) return;
+                const div = document.createElement('div');
+                div.className = 'shape-row';
+                div.dataset.id = pin.id;
+                div.innerHTML = `<strong>${pin.name}</strong>` +
+                    `<div class="muted">${pin.owner || 'Unassigned'}</div>` +
+                    `<div>${pin.days ? `<span class="tag">${pin.days}</span>` : ''}<span class="tag">Pin</span></div>`;
+                div.addEventListener('click', () => {
+                    svg.selectAll('.selected').classed('selected', false);
+                    d3.select(`#custom-pin-${pin.id}`).classed('selected', true);
+                    assignSelection({
+                        kind: 'Point of interest',
+                        name: pin.name,
+                        owner: pin.owner,
+                        days: pin.days,
+                        note: pin.note,
+                        point: { lat: pin.lat, lon: pin.lon }
+                    });
+                });
+                rows.push(div);
+            });
+
+            if (!rows.length) {
+                shapeListEl.innerHTML = '<div class="muted">No custom areas or pins yet.</div>';
+                return;
+            }
+            rows.forEach(r => shapeListEl.appendChild(r));
+        };
+
+        const addCustomAreaFromDraft = () => {
+            if (drawingCoords.length < 3) {
+                statusEl.textContent = 'Need at least three points to close a shape.';
+                return;
+            }
+            const id = `${Date.now()}`;
+            const area = {
+                id,
+                name: areaNameInput.value || `Custom area ${customAreas.length + 1}`,
+                owner: areaOwnerInput.value,
+                days: areaDaysInput.value,
+                label: areaLabelInput.value,
+                color: areaColorInput.value || '#22c55e',
+                note: areaNoteInput.value,
+                coordinates: drawingCoords.map(([lon, lat]) => ({ lon, lat }))
+            };
+            customAreas.push(area);
+            const feature = {
+                type: 'Feature',
+                properties: { ...area },
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [drawingCoords.map(([lon, lat]) => [lon, lat])]
+                }
+            };
+            customAreaFeatures.push(feature);
+            renderCustomArea(feature);
+            refreshShapeList();
+            populateSearch(territoryFeatures, addressIndex, customAreas, customPins);
+            clearDraftLine();
+            drawingMode = false;
+            statusEl.textContent = 'Shape saved. Add more or export definitions when ready.';
+        };
+
+        const addCustomPin = ({ lat, lon }) => {
+            const id = `${Date.now()}`;
+            const pin = {
+                id,
+                name: pinLabelInput.value || `Pin ${customPins.length + 1}`,
+                owner: areaOwnerInput.value,
+                days: areaDaysInput.value,
+                note: areaNoteInput.value,
+                lat,
+                lon
+            };
+            customPins.push(pin);
+            renderCustomPin(pin);
+            refreshShapeList();
+            populateSearch(territoryFeatures, addressIndex, customAreas, customPins);
+            statusEl.textContent = 'Pin saved. Click again to place another or toggle pin mode off.';
+        };
+
+        const handleInteractiveClick = (event) => {
+            const geo = getGeoFromEvent(event);
+            if (!geo) return;
+            if (drawingMode) {
+                drawingCoords.push([geo[0], geo[1]]);
+                updateDraftLine();
+                statusEl.textContent = `${drawingCoords.length} vertices placed. Double click or use Close shape to finish.`;
+            } else if (pinMode) {
+                addCustomPin({ lat: geo[1], lon: geo[0] });
+            }
+        };
+
+        svg.on('click', (event) => {
+            if (drawingMode || pinMode) {
+                handleInteractiveClick(event);
+            }
+        });
+
+        svg.on('dblclick', (event) => {
+            if (drawingMode) {
+                event.preventDefault();
+                addCustomAreaFromDraft();
+            }
+        });
+
+        startDrawBtn.addEventListener('click', () => {
+            drawingMode = true;
+            pinMode = false;
+            clearDraftLine();
+            statusEl.textContent = 'Drawing mode: click to add vertices, double-click to close the shape.';
+        });
+
+        finishDrawBtn.addEventListener('click', addCustomAreaFromDraft);
+
+        cancelDrawBtn.addEventListener('click', () => {
+            drawingMode = false;
+            pinMode = false;
+            clearDraftLine();
+            statusEl.textContent = 'Drawing cancelled.';
+        });
+
+        pinModeBtn.addEventListener('click', () => {
+            pinMode = !pinMode;
+            drawingMode = false;
+            pinModeBtn.textContent = pinMode ? 'Pin mode: ON' : 'Drop pin';
+            statusEl.textContent = pinMode ? 'Pin mode active. Click the map to place a point.' : 'Pin mode off.';
+        });
+
+        shapeFilterInput.addEventListener('input', refreshShapeList);
+
+        exportBtn.addEventListener('click', () => {
+            const payload = {
+                areas: customAreas.map(a => ({
+                    id: a.id,
+                    name: a.name,
+                    owner: a.owner,
+                    days: a.days,
+                    label: a.label,
+                    color: a.color,
+                    note: a.note,
+                    coordinates: a.coordinates
+                })),
+                pins: customPins.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    owner: p.owner,
+                    days: p.days,
+                    note: p.note,
+                    lat: p.lat,
+                    lon: p.lon
+                }))
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'custom-territories.json';
+            link.click();
+            URL.revokeObjectURL(link.href);
+            statusEl.textContent = 'Exported custom definitions as JSON.';
+        });
+
+        refreshShapeList();
 
         const buildLegend = (territories) => {
             const typeColors = new Map();
@@ -370,10 +815,12 @@
             legendEl.appendChild(ul);
         };
 
-        const populateSearch = (territories, addresses) => {
+        const populateSearch = (territories, addresses, customAreaList = [], customPinList = []) => {
             const options = [];
             territories.forEach(t => options.push(t.properties.name));
             addresses.forEach(a => options.push(a.label));
+            customAreaList.forEach(a => options.push(a.name));
+            customPinList.forEach(p => options.push(p.name));
             datalist.innerHTML = '';
             options.sort().forEach(text => {
                 const opt = document.createElement('option');
@@ -386,6 +833,8 @@
             svg.selectAll('.state').classed('selected', false);
             svg.selectAll('.territory').classed('selected', false);
             svg.selectAll('.point').remove();
+            svg.selectAll('.custom-territory').classed('selected', false);
+            svg.selectAll('.poi').classed('selected', false);
             selectionData = null;
             selectionEl.innerHTML = 'Click a state or territory, or search above.';
         };
@@ -393,7 +842,7 @@
         const markPoint = (coords) => {
             const [x, y] = projection([coords.lon, coords.lat]) || [];
             if (!x || !y) return;
-            pointLayer = svg.append('circle')
+            pointLayer.append('circle')
                 .attr('class', 'point')
                 .attr('r', 5)
                 .attr('cx', x)
@@ -406,7 +855,7 @@
         };
 
         const locateState = (pt) => stateFeatures.find((f) => d3.geoContains(f, pt));
-        const locateTerritory = (pt) => territoryFeatures.find((f) => d3.geoContains(f, pt));
+        const locateTerritory = (pt) => [...territoryFeatures, ...customAreaFeatures].find((f) => d3.geoContains(f, pt));
 
         const handleGeocode = () => {
             const query = searchInput.value.trim().toLowerCase();
@@ -428,6 +877,8 @@
                     matchPoint = { ...match };
                 } else {
                     const territory = territoryFeatures.find(t => t.properties.name.toLowerCase().includes(query));
+                    const customArea = customAreaFeatures.find(t => t.properties.name.toLowerCase().includes(query));
+                    const customPin = customPins.find(p => p.name.toLowerCase().includes(query));
                     if (territory) {
                         svg.select(`#territory-${territory.properties.id}`).classed('selected', true);
                         assignSelection({
@@ -438,6 +889,32 @@
                             note: territory.properties.description
                         });
                         statusEl.textContent = 'Jumped to territory.';
+                        return;
+                    }
+                    if (customArea) {
+                        svg.select(`#custom-area-${customArea.properties.id}`).classed('selected', true);
+                        assignSelection({
+                            kind: 'Custom area',
+                            name: customArea.properties.name,
+                            owner: customArea.properties.owner,
+                            days: customArea.properties.days,
+                            label: customArea.properties.label,
+                            note: customArea.properties.note
+                        });
+                        statusEl.textContent = 'Jumped to custom area.';
+                        return;
+                    }
+                    if (customPin) {
+                        markPoint({ lat: customPin.lat, lon: customPin.lon });
+                        assignSelection({
+                            kind: 'Point of interest',
+                            name: customPin.name,
+                            owner: customPin.owner,
+                            days: customPin.days,
+                            note: customPin.note,
+                            point: { lat: customPin.lat, lon: customPin.lon }
+                        });
+                        statusEl.textContent = 'Jumped to saved pin.';
                         return;
                     }
                     statusEl.textContent = 'No address match found.';
@@ -461,6 +938,7 @@
                 kind: containingTerritory ? 'Territory' : 'State',
                 name: containingTerritory ? containingTerritory.properties.name : (containingState?.properties.name || 'Outside coverage'),
                 owner: containingTerritory?.properties.owner,
+                days: containingTerritory?.properties.days,
                 label: containingTerritory?.properties.label,
                 note: matchPoint.note,
                 point: { lat: matchPoint.lat, lon: matchPoint.lon }
@@ -476,7 +954,7 @@
                 projection = d3.geoAlbersUsa().fitSize([960, 600], states);
                 path = d3.geoPath(projection);
 
-                svg.append('g')
+                baseLayer.append('g')
                     .selectAll('path')
                     .data(stateFeatures)
                     .enter()
@@ -485,6 +963,10 @@
                     .attr('id', d => `state-${d.id}`)
                     .attr('d', path)
                     .on('click', (event, d) => {
+                        if (drawingMode || pinMode) {
+                            handleInteractiveClick(event);
+                            return;
+                        }
                         svg.selectAll('.selected').classed('selected', false);
                         d3.select(event.currentTarget).classed('selected', true);
                         assignSelection({ kind: 'State', name: d.properties.name });
@@ -496,7 +978,7 @@
                     geometry: t.geometry
                 }));
 
-                svg.append('g')
+                territoryLayer.append('g')
                     .selectAll('path')
                     .data(territoryFeatures)
                     .enter()
@@ -506,6 +988,10 @@
                     .attr('fill', d => d.properties.color)
                     .attr('d', path)
                     .on('click', (event, d) => {
+                        if (drawingMode || pinMode) {
+                            handleInteractiveClick(event);
+                            return;
+                        }
                         svg.selectAll('.selected').classed('selected', false);
                         d3.select(event.currentTarget).classed('selected', true);
                         assignSelection({
@@ -517,7 +1003,7 @@
                         });
                     });
 
-                svg.append('g')
+                labelLayer.append('g')
                     .selectAll('text')
                     .data(territoryFeatures)
                     .enter()
@@ -529,7 +1015,7 @@
                 buildLegend(territoryFeatures);
 
                 addressIndex = data.geocoder.addresses;
-                populateSearch(territoryFeatures, addressIndex);
+                populateSearch(territoryFeatures, addressIndex, customAreas, customPins);
                 statusEl.textContent = `Loaded ${addressIndex.length} geocoder entries.`;
             });
 
