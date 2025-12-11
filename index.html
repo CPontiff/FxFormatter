@@ -1,3398 +1,547 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerFX Code Formatter</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Territory Map Viewer</title>
     <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #111827;
+            --muted: #9ca3af;
+            --accent: #22c55e;
+            --outline: #1f2937;
+        }
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            overflow: hidden;
-            padding: 10px;
-        }
-        body.theme-dark {
-            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-        }
-        .container {
-            height: 100%;
+            margin: 0;
+            font-family: "Inter", system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 20% 20%, #1f2937, #0b1021 50%);
+            color: #e5e7eb;
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        .theme-dark .container {
-            background: #1a202c;
-            color: #e2e8f0;
-        }
-        .header {
-            background: #2d3748;
-            color: white;
-            padding: 12px 20px;
-            border-bottom: 4px solid #667eea;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header-left {
-            flex: 1;
-        }
-        h1 {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        .subtitle {
-            font-size: 11px;
-            color: #a0aec0;
-            margin-top: 2px;
-        }
-        .style-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            background: rgba(102, 126, 234, 0.3);
-            border-radius: 3px;
-            font-size: 10px;
-            color: #667eea;
-            margin-left: 8px;
-            font-weight: 600;
-        }
-        .header-controls {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .icon-btn {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-        .icon-btn:hover {
-            background: rgba(255,255,255,0.2);
-        }
-        .styles-bar {
-            background: #f7fafc;
-            padding: 10px 20px;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            flex-shrink: 0;
-            overflow-x: auto;
-        }
-        .workflow-bar {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr;
-            gap: 12px;
-            padding: 12px 20px;
-            background: #edf2f7;
-            border-bottom: 2px solid #e2e8f0;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .theme-dark .workflow-bar {
-            background: #2d3748;
-            border-bottom-color: #4a5568;
-        }
-        .workflow-steps {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .workflow-step {
-            background: white;
-            color: #2d3748;
-            border: 1px solid #cbd5e0;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-weight: 600;
-        }
-        .theme-dark .workflow-step {
-            background: #1a202c;
-            border-color: #4a5568;
-            color: #e2e8f0;
-        }
-        .workflow-step.active {
-            border-color: #48bb78;
-            color: #2f855a;
-        }
-        .theme-dark .workflow-step.active {
-            color: #68d391;
-        }
-        .workflow-stats {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-        }
-        .chip {
-            padding: 6px 10px;
-            border-radius: 20px;
-            background: white;
-            border: 1px solid #cbd5e0;
-            font-size: 11px;
-            color: #2d3748;
-            display: inline-flex;
-            gap: 6px;
-            align-items: center;
-            font-weight: 600;
-        }
-        .chip.success {
-            background: #48bb78;
-            color: white;
-            border-color: #48bb78;
-        }
-        .chip.alert {
-            background: #f56565;
-            color: white;
-            border-color: #f56565;
-        }
-        .chip.muted {
-            background: #f7fafc;
-            color: #4a5568;
-        }
-        .theme-dark .chip {
-            background: #1a202c;
-            color: #e2e8f0;
-            border-color: #4a5568;
-        }
-        .theme-dark .chip.muted { background: #2d3748; }
-        .workflow-actions {
-            display: flex;
-            gap: 6px;
-            justify-content: flex-end;
-            flex-wrap: wrap;
-        }
-        .workflow-actions button {
-            flex: 1 1 120px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            justify-content: center;
-            background: #4a5568;
-            color: white;
-        }
-        .workflow-actions button:hover { background: #2d3748; }
-        .theme-dark .workflow-actions button { background: #667eea; }
-        .theme-dark .workflow-actions button:hover { background: #5568d3; }
-        .theme-dark .styles-bar {
-            background: #2d3748;
-            border-bottom-color: #4a5568;
-        }
-        .style-label {
-            font-weight: 600;
-            color: #2d3748;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
-        .theme-dark .style-label {
-            color: #e2e8f0;
-        }
-        .style-select-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            flex: 1;
-        }
-        .style-select {
-            padding: 7px 10px;
-            border: 2px solid #cbd5e0;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 12px;
-            color: #4a5568;
-            background: white;
-            min-width: 220px;
-        }
-        .theme-dark .style-select {
-            background: #2d3748;
-            border-color: #4a5568;
-            color: #e2e8f0;
-        }
-        .style-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            min-width: 200px;
-        }
-        .style-meta .microcopy {
-            font-size: 10px;
-            color: #718096;
-        }
-        .theme-dark .style-meta .microcopy { color: #a0aec0; }
-        .style-status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 8px;
-            border-radius: 999px;
-            border: 1px solid #cbd5e0;
-            background: #f7fafc;
-            color: #4a5568;
-            font-size: 10px;
-            font-weight: 700;
-        }
-        .theme-dark .style-status-pill {
-            background: #2d3748;
-            border-color: #4a5568;
-            color: #e2e8f0;
-        }
-        .save-default-btn {
-            padding: 5px 12px;
-            background: #48bb78;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-        .save-default-btn:hover {
-            background: #38a169;
-        }
-        .main-content {
-            flex: 1;
-            display: flex;
-            overflow: hidden;
-            gap: 0;
-            min-height: 0;
-        }
-        .container.settings-collapsed .main-content {
-            padding-right: 0;
-        }
-        .main-content.vertical {
-            flex-direction: column;
-        }
-        .main-content.vertical .editor-section {
-            flex: 1 1 auto;
-            min-height: 45vh;
-        }
-        .main-content.vertical .settings-panel {
-            width: 100%;
-            min-width: 100%;
-            max-width: 100%;
-            flex: 0 0 auto;
-            border-left: none;
-            border-top: 2px solid #e2e8f0;
-        }
-        .theme-dark .main-content.vertical .settings-panel {
-            border-top-color: #4a5568;
-        }
-        .editor-section {
-            flex: 1;
-            display: flex;
-            position: relative;
-            overflow: hidden;
-            min-height: 0;
-            min-width: 0;
-        }
-        .vertical .editor-section {
-            flex-direction: column;
-        }
-        .panel {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            padding: 12px;
-            flex: 1;
-            min-width: 0;
-            min-height: 0;
-        }
-        .theme-dark .panel {
-            background: #1a202c;
-        }
-        .left-panel {
-            flex: 1;
-            min-width: 100px;
-        }
-        .right-panel {
-            flex: 1;
-            min-width: 100px;
-        }
-        .vertical .left-panel,
-        .vertical .right-panel {
-            flex: 1;
-            min-height: 100px;
-        }
-        .resizer {
-            width: 6px;
-            background: #e2e8f0;
-            cursor: col-resize;
-            position: relative;
-            flex-shrink: 0;
-            transition: background 0.2s;
-            z-index: 10;
-        }
-        .theme-dark .resizer {
-            background: #4a5568;
-        }
-        .vertical .resizer {
-            width: 100%;
-            height: 6px;
-            cursor: row-resize;
-        }
-        .resizer:hover {
-            background: #cbd5e0;
-        }
-        .resizer.active {
-            background: #667eea;
-        }
-        .container.input-collapsed .left-panel,
-        .container.input-collapsed .resizer {
-            display: none;
-        }
-        .container.input-collapsed .right-panel {
-            flex: 1 0 100%;
-        }
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            flex-shrink: 0;
-        }
-        .panel-title {
-            font-weight: 600;
-            color: #2d3748;
-            font-size: 13px;
-        }
-        .theme-dark .panel-title {
-            color: #e2e8f0;
-        }
-        .panel-actions {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-        textarea {
-            width: 100%;
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.5;
-            resize: none;
-            transition: border-color 0.3s;
-            background: white;
-            color: #2d3748;
-            min-height: 0;
-            spellcheck: false;
-            white-space: pre;
-            overflow: auto;
-        }
-        .theme-dark textarea {
-            background: #2d3748;
-            color: #e2e8f0;
-            border-color: #4a5568;
-        }
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        textarea.font-small {
-            font-size: 11px;
-        }
-        textarea.font-medium {
-            font-size: 13px;
-        }
-        textarea.font-large {
-            font-size: 15px;
-        }
-        textarea.font-xlarge {
-            font-size: 17px;
-        }
-        .editor-wrapper {
-            display: flex;
-            gap: 8px;
             align-items: stretch;
-            flex: 1;
-            min-height: 0;
+            justify-content: center;
+            padding: 24px;
         }
-        .line-gutter {
-            width: 48px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            background: #f7fafc;
-            color: #718096;
-            font-size: 11px;
-            padding: 10px 6px;
-            text-align: right;
+        .shell {
+            width: min(1200px, 100%);
+            background: #0b1222;
+            border: 1px solid #16213d;
+            border-radius: 16px;
+            box-shadow: 0 30px 120px rgba(0, 0, 0, 0.45);
             overflow: hidden;
-            user-select: none;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
         }
-        .line-gutter .line-number {
-            line-height: 1.5;
+        header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #16213d;
             display: flex;
-            align-items: flex-start;
-            justify-content: flex-end;
-            padding-right: 2px;
-        }
-        .theme-dark .line-gutter {
-            background: #2d3748;
-            border-color: #4a5568;
-            color: #a0aec0;
-        }
-        .editor-wrapper.hide-line-numbers .line-gutter {
-            display: none;
-        }
-        .editor-wrapper.hide-line-numbers textarea {
-            width: 100%;
-        }
-        .button-group {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-        }
-        button {
-            padding: 7px 14px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 11px;
-            white-space: nowrap;
-        }
-        .btn-primary {
-            background: #667eea;
-            color: white;
-            flex: 1;
-            min-width: 60px;
-        }
-        .btn-primary:hover {
-            background: #5568d3;
-        }
-        .btn-secondary {
-            background: #48bb78;
-            color: white;
-            flex: 1;
-            min-width: 60px;
-        }
-        .btn-secondary:hover {
-            background: #38a169;
-        }
-        .btn-tertiary {
-            background: #ed8936;
-            color: white;
-            flex: 1;
-            min-width: 60px;
-        }
-        .btn-tertiary:hover {
-            background: #dd6b20;
-        }
-        .btn-clear {
-            background: #f56565;
-            color: white;
-            flex: 0;
-        }
-        .btn-clear:hover {
-            background: #e53e3e;
-        }
-        .btn-icon {
-            padding: 7px 12px;
-            background: #e2e8f0;
-            color: #4a5568;
-            flex: 0;
-        }
-        .theme-dark .btn-icon {
-            background: #4a5568;
-            color: #e2e8f0;
-        }
-        .btn-icon:hover {
-            background: #cbd5e0;
-        }
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 10px;
-            flex: 0;
-        }
-        .settings-panel {
-            width: 420px;
-            min-width: 420px;
-            background: #f7fafc;
-            border-left: 2px solid #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            overflow: hidden;
-            transition: width 0.25s ease;
-            min-height: 0;
-        }
-        .theme-dark .settings-panel {
-            background: #2d3748;
-            border-left-color: #4a5568;
-        }
-        .settings-panel.collapsed {
-            width: 0;
-            min-width: 0;
-            max-width: 0;
-            flex-basis: 0;
-            padding: 0;
-            border-left: none;
-        }
-        .settings-panel.collapsed .settings-header,
-        .settings-panel.collapsed .settings-content {
-            display: none;
-        }
-        .settings-header {
-            padding: 12px;
-            background: #edf2f7;
-            border-bottom: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
-            min-width: 420px;
-        }
-        .theme-dark .settings-header {
-            background: #1a202c;
-            border-bottom-color: #4a5568;
-        }
-        .settings-title {
-            font-weight: 600;
-            color: #2d3748;
-            font-size: 13px;
-        }
-        .theme-dark .settings-title {
-            color: #e2e8f0;
-        }
-        .collapse-btn {
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            padding: 4px;
-            color: #4a5568;
-            transition: transform 0.3s;
-        }
-        .theme-dark .collapse-btn {
-            color: #e2e8f0;
-        }
-        .collapse-btn.collapsed {
-            transform: rotate(180deg);
-        }
-        .settings-content {
-            padding: 12px;
-            overflow-y: auto;
-            flex: 1;
-            min-width: 420px;
-            min-height: 0;
-        }
-        .settings-summary {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(72, 187, 120, 0.08));
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-        .theme-dark .settings-summary {
-            border-color: #4a5568;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(72, 187, 120, 0.15));
-        }
-        .summary-header {
-            display: flex;
-            justify-content: space-between;
             gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
+            background: linear-gradient(90deg, #0d1528, #0b1222);
         }
-        .summary-title {
-            font-weight: 700;
-            color: #2d3748;
-            font-size: 13px;
+        header h1 {
+            font-size: 18px;
+            margin: 0;
+        }
+        header small {
+            color: var(--muted);
+        }
+        .main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0;
+            min-height: 640px;
+        }
+        .map-panel {
+            background: #0f172a;
+            border-right: 1px solid #16213d;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+        .controls {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            border-bottom: 1px solid #16213d;
+            background: #0d1426;
+        }
+        .controls label {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
             margin-bottom: 4px;
         }
-        .theme-dark .summary-title { color: #e2e8f0; }
-        .summary-subtitle {
-            color: #718096;
-            font-size: 11px;
-            line-height: 1.5;
-        }
-        .theme-dark .summary-subtitle { color: #a0aec0; }
-        .summary-pills {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .pill {
-            background: #e6f0ff;
-            color: #334266;
-            padding: 4px 8px;
-            border-radius: 999px;
-            font-size: 10px;
-            font-weight: 700;
-            border: 1px solid #cbd5e0;
-        }
-        .theme-dark .pill {
-            background: rgba(102, 126, 234, 0.12);
-            color: #c3dafe;
-            border-color: #4a5568;
-        }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 12px;
-        }
-        .settings-card {
-            background: white;
-            border: 1px solid #e2e8f0;
+        .controls input,
+        .controls button,
+        .controls select {
+            width: 100%;
+            background: #0b1222;
+            border: 1px solid #1f2937;
+            color: #e5e7eb;
+            padding: 10px 12px;
             border-radius: 10px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            position: relative;
-        }
-        .theme-dark .settings-card {
-            background: #1f2737;
-            border-color: #4a5568;
-        }
-        .settings-card.collapsed .card-body {
-            display: none;
-        }
-        .settings-card.collapsed .card-subtitle {
-            display: none;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        .card-title {
-            font-weight: 700;
-            color: #2d3748;
-            font-size: 12px;
-        }
-        .theme-dark .card-title { color: #e2e8f0; }
-        .card-subtitle {
-            font-size: 10px;
-            color: #718096;
-            line-height: 1.4;
-        }
-        .theme-dark .card-subtitle { color: #a0aec0; }
-        .card-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .card-toggle {
-            background: #edf2f7;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            padding: 4px 6px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-        .theme-dark .card-toggle {
-            background: #3a4a5a;
-            border-color: #4a5568;
-            color: #e2e8f0;
-        }
-        .drag-handle {
-            cursor: grab;
             font-size: 14px;
-            color: #a0aec0;
-            user-select: none;
         }
-        .drag-handle:active {
-            cursor: grabbing;
-        }
-        .help-tip {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #edf2f7;
-            color: #4a5568;
-            font-size: 12px;
-            cursor: default;
-        }
-        .theme-dark .help-tip { background: #3a4a5a; color: #e2e8f0; }
-        .help-card {
-            position: absolute;
-            top: 26px;
-            right: 0;
-            background: white;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            border-radius: 8px;
-            padding: 10px;
-            width: 260px;
-            font-size: 11px;
-            line-height: 1.5;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.15s ease;
-            z-index: 5;
-        }
-        .theme-dark .help-card { background: #1a202c; border-color: #4a5568; color: #e2e8f0; }
-        .help-tip:hover .help-card {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .hint-icon {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 18px;
-            height: 18px;
-            margin-left: 6px;
-            border-radius: 50%;
-            background: #edf2f7;
-            color: #4a5568;
-            font-size: 10px;
-            cursor: default;
-            flex-shrink: 0;
-        }
-        .theme-dark .hint-icon { background: #3a4a5a; color: #e2e8f0; }
-        .hint-popover {
-            position: absolute;
-            top: 22px;
-            left: 0;
-            background: white;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            border-radius: 8px;
-            padding: 8px 10px;
-            width: 240px;
-            font-size: 10px;
-            line-height: 1.5;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.15s ease;
-            z-index: 5;
-        }
-        .theme-dark .hint-popover { background: #1a202c; border-color: #4a5568; color: #e2e8f0; }
-        .hint-icon:hover .hint-popover {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .label-with-hint {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .card-body {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .setting-stack .setting-item:not(:last-child) {
-            border-bottom: 1px dashed #e2e8f0;
-            padding-bottom: 6px;
-        }
-        .theme-dark .setting-stack .setting-item:not(:last-child) { border-bottom-color: #4a5568; }
-        .setting-item.inline {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-        }
-        .quick-width-btns.tight { gap: 4px; }
-        .toggle-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .settings-footer {
-            margin-top: 12px;
-        }
-        .functions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 12px;
-        }
-        .tabs {
-            display: flex;
-            gap: 2px;
-            margin-bottom: 12px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        .theme-dark .tabs {
-            border-bottom-color: #4a5568;
-        }
-        .tab-btn {
-            padding: 8px 12px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            color: #718096;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .theme-dark .tab-btn {
-            color: #a0aec0;
-        }
-        .tab-btn:hover {
-            color: #667eea;
-        }
-        .tab-btn.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .style-description {
-            font-size: 11px;
-            color: #718096;
-            font-style: italic;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            padding: 6px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 4px;
-        }
-        .theme-dark .style-description {
-            color: #a0aec0;
-            background: rgba(102, 126, 234, 0.2);
-        }
-        .section-header {
-            font-size: 10px;
+        .controls button {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            color: #0b1021;
             font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 8px;
-            margin-top: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .theme-dark .section-header {
-            color: #e2e8f0;
-        }
-        .section-header.first {
-            margin-top: 0;
-        }
-        .modified-indicator {
-            width: 8px;
-            height: 8px;
-            background: #f56565;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        .collapsible {
-            background: white;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            overflow: hidden;
-        }
-        .theme-dark .collapsible {
-            background: #4a5568;
-            border-color: #718096;
-        }
-        .collapsible-header {
-            padding: 8px 12px;
             cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 600;
-            color: #2d3748;
-            background: #f7fafc;
-            transition: all 0.2s;
+            border: none;
+            box-shadow: 0 12px 30px rgba(34, 197, 94, 0.2);
         }
-        .theme-dark .collapsible-header {
-            color: #e2e8f0;
-            background: #3a4a5a;
+        .controls button.secondary {
+            background: #111827;
+            color: #e5e7eb;
+            border: 1px solid #1f2937;
+            box-shadow: none;
         }
-        .collapsible-header:hover {
-            background: #edf2f7;
+        .map-wrap {
+            position: relative;
         }
-        .theme-dark .collapsible-header:hover {
-            background: #4a5a6a;
+        svg {
+            width: 100%;
+            height: 100%;
         }
-        .collapsible-header.active {
-            background: #667eea;
-            color: white;
-        }
-        .collapsible-header.active .toggle-icon {
-            transform: rotate(180deg);
-        }
-        .toggle-icon {
-            transition: transform 0.2s;
-            font-size: 12px;
-        }
-        .collapsible-content {
-            display: none;
+        .legend {
+            position: absolute;
+            right: 16px;
+            top: 16px;
+            background: rgba(12, 18, 34, 0.9);
+            border: 1px solid #1f2937;
+            border-radius: 10px;
             padding: 12px;
+            backdrop-filter: blur(6px);
         }
-        .collapsible-content.active {
-            display: block;
+        .legend h4 {
+            margin: 0 0 8px;
+            font-size: 12px;
+            color: var(--muted);
+            letter-spacing: 0.08em;
         }
-        .setting-item {
-            display: flex;
-            align-items: center;
+        .legend ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 6px;
+        }
+        .legend li {
+            display: grid;
+            grid-template-columns: 18px 1fr;
             gap: 8px;
-            margin-bottom: 8px;
-            padding: 6px;
-            background: white;
-            border-radius: 4px;
+            align-items: center;
+            font-size: 13px;
         }
-        .theme-dark .setting-item {
-            background: #2d3748;
-        }
-        .setting-item label {
-            font-size: 11px;
-            color: #4a5568;
-            flex: 1;
-            cursor: pointer;
-            user-select: none;
-        }
-        .theme-dark .setting-item label {
-            color: #e2e8f0;
-        }
-        .setting-item input[type="number"],
-        .setting-item select {
-            width: 50px;
-            padding: 4px;
-            border: 1px solid #cbd5e0;
-            border-radius: 4px;
-            font-size: 11px;
-            background: white;
-            color: #2d3748;
-        }
-        .theme-dark .setting-item input[type="number"],
-        .theme-dark .setting-item select {
-            background: #2d3748;
-            border-color: #718096;
-            color: #e2e8f0;
-        }
-        .setting-item select {
-            width: auto;
-            min-width: 70px;
-        }
-        .setting-item input[type="checkbox"] {
+        .legend span.swatch {
             width: 16px;
             height: 16px;
-            cursor: pointer;
-            accent-color: #667eea;
-            flex-shrink: 0;
-        }
-        .quick-width-btns {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 8px;
-        }
-        .quick-width-btn {
-            flex: 1;
-            padding: 4px;
-            background: white;
-            border: 1px solid #cbd5e0;
             border-radius: 4px;
-            cursor: pointer;
-            font-size: 10px;
-            color: #4a5568;
-            font-weight: 500;
+            display: inline-block;
+            border: 1px solid #16213d;
         }
-        .theme-dark .quick-width-btn {
-            background: #2d3748;
-            border-color: #718096;
-            color: #e2e8f0;
+        .info-panel {
+            background: #0d1426;
+            padding: 20px;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 16px;
         }
-        .quick-width-btn:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+        .card {
+            background: #0b1222;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 14px 16px;
         }
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #48bb78;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            font-weight: 600;
+        .card h3 {
+            margin: 0 0 6px;
+            font-size: 15px;
+        }
+        .muted {
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .pill {
+            display: inline-block;
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 999px;
+            padding: 6px 10px;
             font-size: 12px;
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.3s;
-            pointer-events: none;
-            z-index: 1000;
+            color: #cbd5e1;
+            margin-right: 8px;
         }
-        .notification.show {
-            opacity: 1;
-            transform: translateY(0);
+        .selection-details strong {
+            color: #22c55e;
         }
-        .settings-toggle-btn {
-            background: #667eea !important;
-            color: white !important;
-            padding: 6px 12px !important;
-        }
-        .settings-toggle-btn:hover {
-            background: #5568d3 !important;
-        }
-        .func-list {
-            background: white;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            max-height: 150px;
-            overflow-y: auto;
-            margin-bottom: 8px;
-        }
-        .theme-dark .func-list {
-            background: #4a5568;
-            border-color: #718096;
-        }
-        .func-item {
-            padding: 8px 12px;
-            border-bottom: 1px solid #e2e8f0;
-            cursor: pointer;
-            font-size: 11px;
-            transition: all 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .theme-dark .func-item {
-            border-bottom-color: #718096;
-        }
-        .func-item:last-child {
-            border-bottom: none;
-        }
-        .func-item:hover {
-            background: #f0f4f8;
-        }
-        .theme-dark .func-item:hover {
-            background: #5568d3;
-        }
-        .func-item.active {
-            background: #667eea;
-            color: white;
-        }
-        .rule-preview {
-            background: white;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            padding: 8px;
-            margin-bottom: 8px;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 9px;
-            line-height: 1.4;
-            color: #2d3748;
-            max-height: 100px;
-            overflow-y: auto;
-        }
-        .theme-dark .rule-preview {
-            background: #2d3748;
-            border-color: #718096;
-            color: #e2e8f0;
-        }
-        .reset-btn {
-            width: 100%;
-            padding: 8px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
+        .copy-btn {
             margin-top: 10px;
-            transition: all 0.2s;
-        }
-        .reset-btn:hover {
-            background: #5568d3;
-        }
-        .hint {
-            font-size: 9px;
-            color: #a0aec0;
-            margin-top: 4px;
-            font-style: italic;
-        }
-        .insights-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-        .insight-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .theme-dark .insight-card {
-            background: #1a202c;
-            border-color: #4a5568;
-        }
-        .insight-title {
-            font-weight: 700;
-            font-size: 12px;
-            color: #2d3748;
-        }
-        .theme-dark .insight-title { color: #e2e8f0; }
-        .insight-body {
-            font-size: 11px;
-            color: #4a5568;
-            line-height: 1.4;
-        }
-        .theme-dark .insight-body { color: #cbd5e0; }
-        .warning-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .warning-item {
-            background: #fff5f5;
-            color: #c53030;
-            border: 1px solid #fed7d7;
-            padding: 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        .theme-dark .warning-item {
-            background: #742a2a;
-            color: #fed7d7;
-            border-color: #feb2b2;
-        }
-        .warning-item.ok {
-            background: #f0fff4;
-            color: #2f855a;
-            border-color: #c6f6d5;
-        }
-        .theme-dark .warning-item.ok {
-            background: #22543d;
-            color: #c6f6d5;
-            border-color: #68d391;
-        }
-        .snippet-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 8px;
-        }
-        .snippet-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 10px;
+            background: #111827;
+            color: #e5e7eb;
+            border: 1px solid #1f2937;
+            padding: 8px 12px;
             border-radius: 8px;
-            font-size: 11px;
-            text-align: left;
             cursor: pointer;
-            transition: transform 0.1s ease, box-shadow 0.2s;
         }
-        .snippet-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.25);
+        footer {
+            border-top: 1px solid #16213d;
+            padding: 16px 20px;
+            background: #0d1426;
+            font-size: 13px;
+            color: var(--muted);
         }
-        .theme-dark .snippet-btn { background: #5568d3; }
-
-        @media (max-width: 1200px) {
-            .main-content {
-                flex-direction: column;
-            }
-            .editor-section {
-                flex-direction: column;
-            }
-            .resizer {
-                width: 100%;
-                height: 6px;
-                cursor: row-resize;
-            }
-            .settings-panel {
-                width: 100%;
-                border-left: none;
-                border-top: 2px solid #e2e8f0;
-                max-height: 35%;
-            }
-            .theme-dark .settings-panel {
-                border-top-color: #4a5568;
-            }
-            .settings-header {
-                min-width: auto;
-            }
-            .settings-content {
-                min-width: auto;
-            }
+        .state {
+            fill: #0c172e;
+            stroke: #1f2937;
+            stroke-width: 0.75px;
         }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 16px;
-            }
-            .subtitle {
-                display: none;
-            }
+        .territory {
+            stroke: #0b1021;
+            stroke-width: 1.5px;
+            fill-opacity: 0.28;
+        }
+        .territory-label {
+            font-size: 11px;
+            fill: #e5e7eb;
+            text-anchor: middle;
+            pointer-events: none;
+            font-weight: 700;
+            paint-order: stroke;
+            stroke: #0b1021;
+            stroke-width: 3px;
+        }
+        .selected {
+            stroke: #fbbf24;
+            stroke-width: 2.5px;
+        }
+        .point {
+            fill: #fbbf24;
+            stroke: #111827;
+            stroke-width: 1px;
+        }
+        .status {
+            color: #22c55e;
+        }
+        .readme {
+            background: #0b1222;
+            border: 1px dashed #1f2937;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="notification" id="notification"></div>
-    
-    <div class="container">
-        <div class="header">
-            <div class="header-left">
-                <h1>⚡ PowerFX Code Formatter<span class="style-badge" id="activeStyleBadge">Ultra Compact</span></h1>
-                <div class="subtitle">Professional formatting styles for Power Apps</div>
+    <div class="shell">
+        <header>
+            <div>
+                <h1>US State + Territory Viewer</h1>
+                <small>Local assets, offline geocoder, and copyable assignments</small>
             </div>
-            <div class="header-controls">
-                <button class="icon-btn" id="inputToggle" onclick="toggleInputPanel()" title="Toggle input panel">👁️</button>
-                <button class="icon-btn" id="themeToggle" onclick="toggleTheme()">🌙</button>
-                <button class="icon-btn" id="layoutToggle" onclick="toggleLayout()">↔️</button>
-                <button class="icon-btn settings-toggle-btn" id="settingsToggleHeader" onclick="toggleSettingsPanel()">⚙️</button>
-                <div class="help-tip" aria-label="Help tips">
-                    ❔
-                    <div class="help-card">
-                        <strong>Workspace help</strong>
-                        <ul style="margin-left: 14px; margin-top: 6px; line-height: 1.4;">
-                            <li>Hover the line gutter to see indexes and keep wrapped lines clear.</li>
-                            <li>Use the 👁️ button to collapse the input window when you need maximum output space.</li>
-                            <li>Drag the ☰ handle on any settings card to reorder your workflow, or collapse cards you rarely touch.</li>
-                        </ul>
-                        <div style="margin-top: 6px; color: #48bb78; font-weight: 600;">Examples</div>
-                        <div style="font-size: 10px; color: #4a5568; margin-top: 4px;">
-                            <div>• One-parameter-per-line: toggles in Parameters & Calls.</div>
-                            <div>• Brace spacing: Line rhythm → Space before brace.</div>
-                        </div>
+        </header>
+        <div class="main">
+            <section class="map-panel">
+                <div class="controls">
+                    <div>
+                        <label for="search">Search address or territory</label>
+                        <input list="search-options" id="search" name="search" placeholder="Start typing..." />
+                        <datalist id="search-options"></datalist>
+                    </div>
+                    <div>
+                        <label for="lat">Latitude</label>
+                        <input type="number" step="0.0001" id="lat" placeholder="e.g. 37.422" />
+                    </div>
+                    <div>
+                        <label for="lon">Longitude</label>
+                        <input type="number" step="0.0001" id="lon" placeholder="e.g. -122.084" />
+                    </div>
+                    <div>
+                        <label for="go">&nbsp;</label>
+                        <button id="geocode">Locate</button>
+                    </div>
+                    <div>
+                        <label for="reset">&nbsp;</label>
+                        <button id="reset" class="secondary">Reset view</button>
                     </div>
                 </div>
-            </div>
+                <div class="map-wrap">
+                    <svg id="map" viewBox="0 0 960 600"></svg>
+                    <div class="legend" id="legend"></div>
+                </div>
+            </section>
+            <aside class="info-panel">
+                <div class="card selection-details">
+                    <h3>Selection</h3>
+                    <div id="selection">Click a state or territory, or search above.</div>
+                    <button class="copy-btn" id="copy">Copy details</button>
+                </div>
+                <div class="card">
+                    <h3>Geocoder status</h3>
+                    <p class="muted">Prebuilt address index ships locally. You can also paste lat/lon to drop a point anywhere in the US map.</p>
+                    <p class="status" id="status">Ready.</p>
+                </div>
+                <div class="card readme">
+                    <h3>How to update data</h3>
+                    <ol class="muted">
+                        <li>Edit <code>data/map-data.json</code> to change the TopoJSON or territories.</li>
+                        <li>Territories follow GeoJSON Polygon coordinates; update <code>color</code>, <code>owner</code>, and labels as needed.</li>
+                        <li>Append to <code>geocoder.addresses</code> with new address-to-coordinate entries.</li>
+                        <li>Refresh the page; all assets are loaded locally.</li>
+                    </ol>
+                </div>
+            </aside>
         </div>
-        
-        <div class="styles-bar">
-            <span class="style-label">Style:</span>
-            <div class="style-select-wrap">
-                <select id="styleSelect" class="style-select" onchange="handleStyleChange(this.value)"></select>
-                <div class="style-meta">
-                    <span class="style-status-pill" id="styleStatus">Default preset</span>
-                    <span class="microcopy">Hover a setting to see an example. Custom presets appear automatically when you tweak a style.</span>
-                </div>
-            </div>
-            <button class="save-default-btn" onclick="saveAsDefault()">💾 Save</button>
-        </div>
-
-        <div class="workflow-bar">
-            <div class="workflow-steps">
-                <div class="workflow-step active">1️⃣ Paste / Type</div>
-                <div class="workflow-step">2️⃣ Tune settings</div>
-                <div class="workflow-step">3️⃣ Export</div>
-            </div>
-            <div class="workflow-stats">
-                <span class="chip" id="lineCountChip">0 lines</span>
-                <span class="chip" id="charCountChip">0 chars</span>
-                <span class="chip muted" id="functionChip">0 functions</span>
-                <span class="chip success" id="diagnosticChip">All clear</span>
-            </div>
-            <div class="workflow-actions">
-                <button onclick="importCodeFile()">⬆️ Import code</button>
-                <button onclick="downloadOutput()">⬇️ Download output</button>
-                <button onclick="resetWorkspace()">♻️ Reset workspace</button>
-            </div>
-        </div>
-        
-        <div class="main-content" id="mainContent">
-            <div class="editor-section">
-                <div class="panel left-panel" id="inputPanel">
-                    <div class="panel-header">
-                        <span class="panel-title">📝 Input</span>
-                        <div class="panel-actions">
-                            <div class="help-tip" aria-label="Input help">
-                                ❔
-                                <div class="help-card">
-                                    Keep line numbers visible to avoid mixing wrapped text with true newlines. Use Ctrl + Enter to format fast.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="editor-wrapper">
-                        <div class="line-gutter" id="inputLines" aria-hidden="true"></div>
-                        <textarea id="input" placeholder="Paste your PowerFX code here..." spellcheck="false" wrap="off"></textarea>
-                    </div>
-                    <div class="button-group">
-                        <button class="btn-primary" onclick="formatCode()">🔄 Format</button>
-                        <button class="btn-clear" onclick="clearInput()">✖</button>
-                        <button class="btn-icon" onclick="pasteFromClipboard()" title="Paste">📋</button>
-                    </div>
-                </div>
-                
-                <div class="resizer" id="resizer"></div>
-                
-                <div class="panel right-panel">
-                    <div class="panel-header">
-                        <span class="panel-title">✨ Output</span>
-                        <div class="panel-actions">
-                            <div class="help-tip" aria-label="Output help">
-                                ❔
-                                <div class="help-card">
-                                    Line numbers stay locked to the formatted text so you can compare against input quickly. Collapse the input panel if you want a wide preview.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="editor-wrapper">
-                        <div class="line-gutter" id="outputLines" aria-hidden="true"></div>
-                        <textarea id="output" placeholder="Formatted code will appear here..." readonly spellcheck="false" wrap="off"></textarea>
-                    </div>
-                    <div class="button-group">
-                        <button class="btn-secondary" onclick="copyToClipboard()">📋 Copy</button>
-                        <button class="btn-tertiary" onclick="copyOutputToInput()">↩️ To Input</button>
-                        <button class="btn-clear" onclick="clearOutput()">✖</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="settings-panel" id="settingsPanel">
-                <div class="settings-header">
-                    <span class="settings-title">⚙️ Settings</span>
-                    <button class="collapse-btn" id="collapseBtn" onclick="toggleSettingsPanel()">◀</button>
-                </div>
-                <div class="settings-content">
-                    <div class="tabs">
-                        <button class="tab-btn active" onclick="switchTab('global')">Global</button>
-                        <button class="tab-btn" onclick="switchTab('functions')">Functions</button>
-                        <button class="tab-btn" onclick="switchTab('advanced')">Advanced</button>
-                    </div>
-
-                    <!-- GLOBAL TAB -->
-                    <div id="global-tab" class="tab-content active">
-                        <div class="settings-summary">
-                            <div class="summary-header">
-                                <div>
-                                    <div class="summary-title">PowerFX formatting cockpit</div>
-                                    <div class="summary-subtitle">Tune whitespace, breaks, and call structure so the formatter mirrors your personal style.</div>
-                                </div>
-                                <div class="summary-pills">
-                                    <span class="pill">Consistent layouts</span>
-                                    <span class="pill">Iterate quickly</span>
-                                    <span class="pill">Shareable presets</span>
-                                </div>
-                            </div>
-                            <div class="style-description" id="styleDescription"></div>
-                        </div>
-
-                        <div class="insights-grid">
-                            <div class="insight-card">
-                                <div class="insight-title">Formatter health</div>
-                                <div class="warning-list" id="warningList">
-                                    <div class="warning-item ok">✅ Paste code to see structural checks.</div>
-                                </div>
-                            </div>
-                            <div class="insight-card">
-                                <div class="insight-title">Starter snippets</div>
-                                <div class="insight-body">Insert common patterns to test spacing, wrapping, and indentation.</div>
-                                <div class="snippet-grid">
-                                    <button class="snippet-btn" onclick="insertSnippet('if')">IF + Patch flow</button>
-                                    <button class="snippet-btn" onclick="insertSnippet('with')">With + LookUp combo</button>
-                                    <button class="snippet-btn" onclick="insertSnippet('collection')">Collect + ForAll</button>
-                                    <button class="snippet-btn" onclick="insertSnippet('toggle')">Toggle with Switch</button>
-                                </div>
-                            </div>
-                            <div class="insight-card">
-                                <div class="insight-title">Workflow tips</div>
-                                <div class="insight-body">
-                                    <ul style="margin-left: 16px; line-height: 1.5;">
-                                        <li>Use <strong>Ctrl + Enter</strong> to format instantly.</li>
-                                        <li>Apply presets, then tweak individual rules—chips above keep you honest.</li>
-                                        <li>Export your formatted output to share a one-file solution with teammates.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="settings-grid">
-                            <div class="settings-card" data-card-key="workflow-display">
-                                <div class="card-header">
-                                    <div>
-                                        <div class="card-title">Workflow & Display</div>
-                                        <div class="card-subtitle">Keep the workspace readable while you iterate.</div>
-                                    </div>
-                                    <div class="card-actions">
-                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse workflow card">▾</button>
-                                        <span class="drag-handle" title="Drag to reorder">☰</span>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="setting-item inline">
-                                        <label for="fontSize">Font size</label>
-                                        <select id="fontSize" onchange="updateFontSize()">
-                                            <option value="small">Small</option>
-                                            <option value="medium" selected>Medium</option>
-                                            <option value="large">Large</option>
-                                            <option value="xlarge">X-Large</option>
-                                        </select>
-                                    </div>
-                                    <div class="setting-item inline">
-                                        <label>Container width</label>
-                                        <div class="quick-width-btns tight">
-                                            <button class="quick-width-btn" onclick="setWidth('30%')">30%</button>
-                                            <button class="quick-width-btn" onclick="setWidth('40%')">40%</button>
-                                            <button class="quick-width-btn" onclick="setWidth('50%')">50%</button>
-                                            <button class="quick-width-btn" onclick="setWidth('60%')">60%</button>
-                                        </div>
-                                    </div>
-                                    <div class="setting-item">
-                                        <div class="toggle-row">
-                                            <input type="checkbox" id="liveFormatting" checked onchange="toggleLiveFormatting()">
-                                            <label for="liveFormatting">Live formatting while typing</label>
-                                        </div>
-                                        <div class="hint">Disable to tweak options freely, then press Format when ready.</div>
-                                    </div>
-                                    <div class="setting-item">
-                                        <div class="toggle-row">
-                                            <input type="checkbox" id="showLineNumbers" onchange="toggleLineNumbersVisibility()" disabled>
-                                            <label for="showLineNumbers">Show line numbers (temporarily disabled)</label>
-                                        </div>
-                                        <div class="hint">Line numbers are off for now while we refine formatting behavior.</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="settings-card" data-card-key="indentation">
-                                <div class="card-header">
-                                    <div class="card-title">Indentation</div>
-                                    <div class="card-subtitle">Control depth and brace behavior.</div>
-                                    <div class="card-actions">
-                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse indentation card">▾</button>
-                                        <span class="drag-handle" title="Drag to reorder">☰</span>
-                                    </div>
-                                </div>
-                                <div class="card-body setting-stack">
-                                    <div class="setting-item inline">
-                                        <label for="indentSize">Spaces per indent</label>
-                                        <input type="number" id="indentSize" value="2" min="0" max="8" onchange="markModified(); autoFormat()">
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="indentParams" checked onchange="markModified(); autoFormat()">
-                                        <label for="indentParams">Indent parameters</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="indentAfterComma" onchange="markModified(); autoFormat()">
-                                        <label for="indentAfterComma">Extra indent after comma</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="indentBraceContent" onchange="markModified(); autoFormat()">
-                                        <label for="indentBraceContent">Indent brace content</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="settings-card" data-card-key="spacing">
-                                <div class="card-header">
-                                    <div class="card-title">Spacing & Operators</div>
-                                    <div class="card-subtitle">Make logic readable without adding clutter.</div>
-                                    <div class="card-actions">
-                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse spacing card">▾</button>
-                                        <span class="drag-handle" title="Drag to reorder">☰</span>
-                                    </div>
-                                </div>
-                                <div class="card-body setting-stack">
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="operatorSpacing" checked onchange="markModified(); autoFormat()">
-                                        <label for="operatorSpacing">Space around operators</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="keepMathOperatorsTogether" checked onchange="markModified(); autoFormat()">
-                                        <label for="keepMathOperatorsTogether">Keep math ops together</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="spaceAfterComma" checked onchange="markModified(); autoFormat()">
-                                        <label for="spaceAfterComma">Space after commas</label>
-                                    </div>
-                                    <div class="setting-item inline">
-                                        <label for="commaStyle">Comma style</label>
-                                        <select id="commaStyle" onchange="markModified(); autoFormat()">
-                                            <option value="none">None</option>
-                                            <option value="space" selected>Space only</option>
-                                            <option value="break">Break only</option>
-                                            <option value="both">Space + Break</option>
-                                        </select>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="spaceBeforeParen" onchange="markModified(); autoFormat()">
-                                        <label for="spaceBeforeParen">Space before parenthesis</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="spaceBeforeBrace" onchange="markModified(); autoFormat()">
-                                        <label for="spaceBeforeBrace">Space before brace</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="operatorNewLine" onchange="markModified(); autoFormat()">
-                                        <label for="operatorNewLine">Operator at line start</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="settings-card" data-card-key="parameters">
-                                <div class="card-header">
-                                    <div class="card-title">Parameters & Calls</div>
-                                    <div class="card-subtitle">Shape how arguments sit with function names.</div>
-                                    <div class="card-actions">
-                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse parameters card">▾</button>
-                                        <span class="drag-handle" title="Drag to reorder">☰</span>
-                                    </div>
-                                </div>
-                                <div class="card-body setting-stack">
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="paramOnSameLine" checked onchange="markModified(); autoFormat()">
-                                        <div class="label-with-hint">
-                                            <label for="paramOnSameLine">Params on same line</label>
-                                            <span class="hint-icon" aria-label="Show example for params on same line">?
-                                                <div class="hint-popover"><strong>Inline arguments</strong><br>Function and first argument stay together: <code>Sum(value1, value2)</code>. Disable to drop arguments to the next line.</div>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="breakAfterFirstParam" onchange="markModified(); autoFormat()">
-                                        <div class="label-with-hint">
-                                            <label for="breakAfterFirstParam">Break after 1st param</label>
-                                            <span class="hint-icon" aria-label="Show example for breaking after first param">?
-                                                <div class="hint-popover"><strong>Hanging list</strong><br>Keep the first argument with the function name, then wrap: <code>Patch(record,<br>&nbsp;&nbsp;change1,<br>&nbsp;&nbsp;change2)</code>.</div>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="hint">Keep the first argument with the function name, drop the rest underneath.</div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="oneParamPerLine" onchange="markModified(); autoFormat()">
-                                        <div class="label-with-hint">
-                                            <label for="oneParamPerLine">One param per line</label>
-                                            <span class="hint-icon" aria-label="Show example for one param per line">?
-                                                <div class="hint-popover"><strong>Stacked parameters</strong><br>Each argument sits on its own line for diff-friendly changes: <code>Filter(<br>&nbsp;&nbsp;source,<br>&nbsp;&nbsp;condition1,<br>&nbsp;&nbsp;condition2<br>)</code>.</div>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="trailingComma" onchange="markModified(); autoFormat()">
-                                        <div class="label-with-hint">
-                                            <label for="trailingComma">Trailing comma on last param</label>
-                                            <span class="hint-icon" aria-label="Show example for trailing comma">?
-                                                <div class="hint-popover"><strong>Diff-safe endings</strong><br>Add a comma after the final argument so future edits only change one line: <code>Collect(<br>&nbsp;&nbsp;source,<br>&nbsp;&nbsp;payload,<br>)</code>.</div>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="settings-card" data-card-key="line-rhythm">
-                                <div class="card-header">
-                                    <div class="card-title">Line rhythm</div>
-                                    <div class="card-subtitle">Control cadence for blocks and statements.</div>
-                                    <div class="card-actions">
-                                        <button class="card-toggle" onclick="toggleCard(this)" aria-label="Collapse line rhythm card">▾</button>
-                                        <span class="drag-handle" title="Drag to reorder">☰</span>
-                                    </div>
-                                </div>
-                                <div class="card-body setting-stack">
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="openParenNewline" onchange="markModified(); autoFormat()">
-                                        <label for="openParenNewline">New line after (</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="closeParenNewline" onchange="markModified(); autoFormat()">
-                                        <label for="closeParenNewline">New line before )</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="openBraceNewline" onchange="markModified(); autoFormat()">
-                                        <label for="openBraceNewline">New line after {</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="closeBraceNewline" onchange="markModified(); autoFormat()">
-                                        <label for="closeBraceNewline">New line before }</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="semicolonNewline" checked onchange="markModified(); autoFormat()">
-                                        <label for="semicolonNewline">New line after semicolon</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="blockCommaNewline" checked onchange="markModified(); autoFormat()">
-                                        <label for="blockCommaNewline">New line after comma inside blocks</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="blockSemicolonNewline" checked onchange="markModified(); autoFormat()">
-                                        <label for="blockSemicolonNewline">New line after semicolon inside blocks</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="extraLinesBetweenStatements" onchange="markModified(); autoFormat()">
-                                        <label for="extraLinesBetweenStatements">Extra lines between statements</label>
-                                    </div>
-                                    <div class="setting-item toggle-row">
-                                        <input type="checkbox" id="extraLinesAfterBraces" onchange="markModified(); autoFormat()">
-                                        <label for="extraLinesAfterBraces">Extra line after closing }</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="settings-footer">
-                            <button class="reset-btn" onclick="resetToPreset()">↻ Reset to Preset</button>
-                        </div>
-                    </div>
-
-                    <!-- FUNCTIONS TAB -->
-                    <div id="functions-tab" class="tab-content">
-                        <div class="section-header first">
-                            <span>FUNCTION-SPECIFIC RULES</span>
-                            <span style="font-size: 9px; color: #718096;">Auto-detected from code</span>
-                        </div>
-                        <div class="functions-grid">
-                            <div class="settings-card">
-                                <div class="card-header">
-                                    <div class="card-title">Detected functions</div>
-                                    <div class="card-subtitle">Click a name to tailor spacing, commas, and braces.</div>
-                                </div>
-                                <div id="funcList" class="func-list"></div>
-                            </div>
-
-                            <div class="settings-card" id="funcEditor" style="display: none;">
-                                <div class="card-header" style="align-items: center;">
-                                    <span id="selectedFuncName" style="color: #667eea; font-weight: 700;"></span>
-                                    <button class="btn-small btn-clear" onclick="clearFunctionRule()">✕</button>
-                                </div>
-
-                                <div class="collapsible">
-                                    <div class="collapsible-header active" onclick="toggleSection(this)">
-                                        <span>PARAMETERS</span>
-                                        <span class="toggle-icon">▼</span>
-                                    </div>
-                                    <div class="collapsible-content active">
-                                        <div class="setting-item">
-                                            <input type="checkbox" id="funcParamOnSameLine" checked onchange="previewFunctionRule()">
-                                            <label for="funcParamOnSameLine">Params on same line</label>
-                                        </div>
-                                        <div class="setting-item">
-                                            <input type="checkbox" id="funcBreakAfterFirst" onchange="previewFunctionRule()">
-                                            <label for="funcBreakAfterFirst">Break after 1st param</label>
-                                        </div>
-                                        <div class="setting-item">
-                                            <input type="checkbox" id="funcOneParamPerLine" onchange="previewFunctionRule()">
-                                            <label for="funcOneParamPerLine">One param per line</label>
-                                        </div>
-                                        <div class="setting-item">
-                                            <input type="checkbox" id="funcIndentParams" onchange="previewFunctionRule()">
-                                            <label for="funcIndentParams">Indent parameters</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="collapsible">
-                                    <div class="collapsible-header active" onclick="toggleSection(this)">
-                                        <span>LINE BREAKS</span>
-                                        <span class="toggle-icon">▼</span>
-                                    </div>
-                                    <div class="collapsible-content active">
-                                        <div class="setting-item">
-                                            <input type="checkbox" id="funcOpenParenNewline" onchange="previewFunctionRule()">
-                                            <label for="funcOpenParenNewline">New line after (</label>
-                                        </div>
-                                        <div class="setting-item">
-                                            <input type="checkbox" id="funcCloseParenNewline" onchange="previewFunctionRule()">
-                                            <label for="funcCloseParenNewline">New line before )</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="section-header">Commas & Braces</div>
-                                <div class="setting-item">
-                                    <label for="funcCommaStyle">Comma style (override)</label>
-                                    <select id="funcCommaStyle" onchange="previewFunctionRule()">
-                                        <option value="">Use global</option>
-                                        <option value="space">Space only</option>
-                                        <option value="break">Line break only</option>
-                                        <option value="both">Space + Break</option>
-                                        <option value="none">No space/break</option>
-                                    </select>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="funcSpaceBeforeBrace" onchange="previewFunctionRule()">
-                                    <label for="funcSpaceBeforeBrace">Space before {</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="funcOpenBraceNewline" onchange="previewFunctionRule()">
-                                    <label for="funcOpenBraceNewline">New line after {</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="funcCloseBraceNewline" onchange="previewFunctionRule()">
-                                    <label for="funcCloseBraceNewline">New line before }</label>
-                                </div>
-                                <div class="setting-item">
-                                    <input type="checkbox" id="funcIndentBraceContent" onchange="previewFunctionRule()">
-                                    <label for="funcIndentBraceContent">Indent brace content</label>
-                                </div>
-
-                                <div class="section-header">PREVIEW</div>
-                                <div class="rule-preview" id="rulePreview"></div>
-
-                                <button class="btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveFunctionRule()">✓ Save Rule</button>
-                            </div>
-                        </div>
-
-                        <button class="btn-primary" style="width: 100%; margin-top: 12px; display: none;" id="addFuncBtn" onclick="createNewFunctionRule()">+ Create Custom Rule</button>
-                    </div>
-                    <!-- ADVANCED TAB -->
-                    <div id="advanced-tab" class="tab-content">
-                        <div class="section-header first">PRESETS</div>
-                        <div style="font-size: 11px; line-height: 1.6; color: #718096; margin-bottom: 12px;">
-                            <strong>Current Status:</strong><br>
-                            Style: <span id="statusStyle" style="color: #667eea;"></span><br>
-                            Modified: <span id="statusModified" style="color: #f56565;"></span><br>
-                            Function Rules: <span id="statusFuncRules" style="color: #667eea;"></span>
-                        </div>
-
-                        <div class="section-header">MANAGEMENT</div>
-                        <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="saveCurrentAsPreset()">💾 Save as Custom Preset</button>
-                        <button class="btn-primary" style="width: 100%; margin-bottom: 8px;" onclick="exportSettings()">↓ Export Settings</button>
-                        <button class="btn-secondary" style="width: 100%; margin-bottom: 8px;" onclick="importSettings()">↑ Import Settings</button>
-                        <button class="btn-clear" style="width: 100%;" onclick="clearAllRules()">⚠️ Clear All Custom Rules</button>
-
-                        <div class="section-header">KEYBOARD</div>
-                        <div style="font-size: 10px; line-height: 1.8; color: #718096;">
-                            <strong>Ctrl + Enter:</strong> Format code<br>
-                            <strong>Ctrl + ,:</strong> Toggle settings<br>
-                            <strong>Click function:</strong> Edit rule
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <footer>
+            Built with local D3 + TopoJSON. Click to inspect states or territories, search to zoom to a location, and use the Copy button to grab assignment text.
+        </footer>
     </div>
-
+    <script src="libs/d3.min.js"></script>
+    <script src="libs/topojson-client.min.js"></script>
     <script>
-        const STYLE_PRESETS = {
-            'ultra-compact': {
-                name: 'Ultra Compact',
-                description: 'Minimal whitespace - everything tight and condensed',
-                indentSize: 2,
-                indentParams: false,
-                indentAfterComma: false,
-                indentBraceContent: false,
-                operatorSpacing: true,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: true,
-                commaStyle: 'space',
-                spaceBeforeParen: false,
-                spaceBeforeBrace: false,
-                operatorNewLine: false,
-                paramOnSameLine: true,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: false,
-                closeParenNewline: false,
-                openBraceNewline: false,
-                closeBraceNewline: false,
-                semicolonNewline: false,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: false,
-                extraLinesAfterBraces: false,
-            },
-            'compact': {
-                name: 'Compact',
-                description: 'Balanced compact style - tight but readable',
-                indentSize: 2,
-                indentParams: false,
-                indentAfterComma: false,
-                indentBraceContent: false,
-                operatorSpacing: true,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: true,
-                commaStyle: 'space',
-                spaceBeforeParen: false,
-                spaceBeforeBrace: false,
-                operatorNewLine: false,
-                paramOnSameLine: true,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: false,
-                closeParenNewline: false,
-                openBraceNewline: false,
-                closeBraceNewline: false,
-                semicolonNewline: true,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: false,
-                extraLinesAfterBraces: false,
-            },
-            'balanced': {
-                name: 'Balanced',
-                description: 'Good mix of compact and readable',
-                indentSize: 3,
-                indentParams: true,
-                indentAfterComma: false,
-                indentBraceContent: true,
-                operatorSpacing: true,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: true,
-                commaStyle: 'space',
-                spaceBeforeParen: false,
-                spaceBeforeBrace: true,
-                operatorNewLine: false,
-                paramOnSameLine: false,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: false,
-                closeParenNewline: false,
-                openBraceNewline: true,
-                closeBraceNewline: true,
-                semicolonNewline: true,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: true,
-                extraLinesAfterBraces: true,
-            },
-            'readable': {
-                name: 'Readable',
-                description: 'More whitespace for easier reading',
-                indentSize: 4,
-                indentParams: true,
-                indentAfterComma: true,
-                indentBraceContent: true,
-                operatorSpacing: true,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: true,
-                commaStyle: 'both',
-                spaceBeforeParen: true,
-                spaceBeforeBrace: true,
-                operatorNewLine: false,
-                paramOnSameLine: false,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: true,
-                closeParenNewline: true,
-                openBraceNewline: true,
-                closeBraceNewline: true,
-                semicolonNewline: true,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: true,
-                extraLinesAfterBraces: true,
-            },
-            'python-style': {
-                name: 'Python-like',
-                description: 'Clean and readable like Python',
-                indentSize: 4,
-                indentParams: true,
-                indentAfterComma: false,
-                indentBraceContent: true,
-                operatorSpacing: true,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: true,
-                commaStyle: 'space',
-                spaceBeforeParen: false,
-                spaceBeforeBrace: true,
-                operatorNewLine: true,
-                paramOnSameLine: false,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: false,
-                closeParenNewline: false,
-                openBraceNewline: true,
-                closeBraceNewline: true,
-                semicolonNewline: true,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: true,
-                extraLinesAfterBraces: false,
-            },
-            'javascript-style': {
-                name: 'JavaScript-like',
-                description: 'Modern JavaScript conventions',
-                indentSize: 2,
-                indentParams: true,
-                indentAfterComma: false,
-                indentBraceContent: true,
-                operatorSpacing: true,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: true,
-                commaStyle: 'space',
-                spaceBeforeParen: false,
-                spaceBeforeBrace: true,
-                operatorNewLine: false,
-                paramOnSameLine: true,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: false,
-                closeParenNewline: false,
-                openBraceNewline: true,
-                closeBraceNewline: false,
-                semicolonNewline: true,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: false,
-                extraLinesAfterBraces: false,
-            },
-            'csharp-style': {
-                name: 'C#-like',
-                description: 'Microsoft C# standards',
-                indentSize: 4,
-                indentParams: true,
-                indentAfterComma: false,
-                indentBraceContent: true,
-                operatorSpacing: true,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: true,
-                commaStyle: 'space',
-                spaceBeforeParen: true,
-                spaceBeforeBrace: true,
-                operatorNewLine: false,
-                paramOnSameLine: false,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: false,
-                closeParenNewline: false,
-                openBraceNewline: true,
-                closeBraceNewline: true,
-                semicolonNewline: true,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: true,
-                extraLinesAfterBraces: true,
-            },
-            'sql-style': {
-                name: 'SQL-like',
-                description: 'SQL formatting - emphasizes separation',
-                indentSize: 3,
-                indentParams: true,
-                indentAfterComma: false,
-                indentBraceContent: true,
-                operatorSpacing: true,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: true,
-                commaStyle: 'both',
-                spaceBeforeParen: false,
-                spaceBeforeBrace: true,
-                operatorNewLine: true,
-                paramOnSameLine: false,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: false,
-                closeParenNewline: false,
-                openBraceNewline: true,
-                closeBraceNewline: true,
-                semicolonNewline: true,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: true,
-                extraLinesAfterBraces: true,
-            },
-            'one-liner': {
-                name: 'One-Liner',
-                description: 'Everything on one line',
-                indentSize: 0,
-                indentParams: false,
-                indentAfterComma: false,
-                indentBraceContent: false,
-                operatorSpacing: false,
-                keepMathOperatorsTogether: true,
-                spaceAfterComma: false,
-                commaStyle: 'none',
-                spaceBeforeParen: false,
-                spaceBeforeBrace: false,
-                operatorNewLine: false,
-                paramOnSameLine: true,
-                breakAfterFirstParam: false,
-                oneParamPerLine: false,
-                trailingComma: false,
-                openParenNewline: false,
-                closeParenNewline: false,
-                openBraceNewline: false,
-                closeBraceNewline: false,
-                semicolonNewline: false,
-                blockCommaNewline: true,
-                blockSemicolonNewline: true,
-                extraLinesBetweenStatements: false,
-                extraLinesAfterBraces: false,
-            }
+        const svg = d3.select('#map');
+        const legendEl = document.getElementById('legend');
+        const selectionEl = document.getElementById('selection');
+        const statusEl = document.getElementById('status');
+        const searchInput = document.getElementById('search');
+        const latInput = document.getElementById('lat');
+        const lonInput = document.getElementById('lon');
+        const geocodeBtn = document.getElementById('geocode');
+        const resetBtn = document.getElementById('reset');
+        const copyBtn = document.getElementById('copy');
+        const datalist = document.getElementById('search-options');
+
+        let projection = d3.geoAlbersUsa().translate([480, 300]).scale(1200);
+        let path = d3.geoPath(projection);
+        let stateFeatures = [];
+        let territoryFeatures = [];
+        let addressIndex = [];
+        let pointLayer;
+        let selectionData = null;
+
+        const formatSelection = (data) => {
+            if (!data) return 'Nothing selected yet.';
+            const lines = [];
+            lines.push(`<div class="pill">${data.kind}</div>`);
+            lines.push(`<strong>${data.name}</strong>`);
+            if (data.owner) lines.push(`<div class="muted">Owner: ${data.owner}</div>`);
+            if (data.note) lines.push(`<div class="muted">Note: ${data.note}</div>`);
+            if (data.point) lines.push(`<div class="muted">Point: ${data.point.lat.toFixed(4)}, ${data.point.lon.toFixed(4)}</div>`);
+            if (data.label) lines.push(`<div class="muted">Label: ${data.label}</div>`);
+            return lines.join('<br>');
         };
 
-        let currentStyle = 'ultra-compact';
-        let userLayoutPreference = 'horizontal';
-        let globalSettings = {};
-        let functionRules = {};
-        let detectedFunctions = new Set();
-        let presetSettings = {};
-        let isModified = false;
-        let autoPresetCaptured = false;
-        let resizingElement = null;
-        let selectedFunction = null;
-        let liveFormattingEnabled = true;
-        let lineNumbersVisible = false;
-        const CARD_ORDER_KEY = 'powerFxCardOrder';
-        let draggingCard = null;
-        const lineMeasureElements = {};
-
-        window.addEventListener('DOMContentLoaded', () => {
-            loadPreferences();
-            setupStyleSelector();
-            const savedStyle = localStorage.getItem('powerFxDefaultStyle') || 'ultra-compact';
-            applyStyle(savedStyle);
-            updateLayoutDisplay();
-            loadFunctionRules();
-            updateStatus();
-            initializeCardControls();
-            setupLineNumberListeners();
-            refreshAllLineNumbers();
-        });
-
-        window.addEventListener('resize', () => {
-            updateLayoutDisplay();
-            refreshAllLineNumbers();
-        });
-
-        function toggleSection(el) {
-            const content = el.nextElementSibling;
-            el.classList.toggle('active');
-            content.classList.toggle('active');
-        }
-
-        function switchTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tab + '-tab').classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function loadPreferences() {
-            const theme = localStorage.getItem('powerFxTheme') || 'light';
-            const layout = localStorage.getItem('powerFxLayout') || 'horizontal';
-            const fontSize = localStorage.getItem('powerFxFontSize') || 'medium';
-            const livePref = localStorage.getItem('powerFxLiveFormatting');
-            const inputCollapsed = localStorage.getItem('powerFxInputCollapsed') === 'true';
-
-            if (theme === 'dark') {
-                document.body.classList.add('theme-dark');
-                document.getElementById('themeToggle').textContent = '☀️';
-            }
-
-            userLayoutPreference = layout;
-            document.getElementById('fontSize').value = fontSize;
-            updateFontSize();
-
-            if (inputCollapsed) {
-                document.querySelector('.container').classList.add('input-collapsed');
-                const toggleBtn = document.getElementById('inputToggle');
-                if (toggleBtn) toggleBtn.textContent = '🪟';
-            }
-
-            liveFormattingEnabled = livePref !== 'false';
-            const liveToggle = document.getElementById('liveFormatting');
-            if (liveToggle) liveToggle.checked = liveFormattingEnabled;
-
-            lineNumbersVisible = false;
-            const lineNumberToggle = document.getElementById('showLineNumbers');
-            if (lineNumberToggle) {
-                lineNumberToggle.checked = false;
-            }
-            localStorage.setItem('powerFxShowLineNumbers', 'false');
-            applyLineNumberVisibility();
-        }
-
-        function loadFunctionRules() {
-            const saved = localStorage.getItem('powerFxFunctionRules');
-            functionRules = saved ? JSON.parse(saved) : {};
-        }
-
-        function loadCustomPresets() {
-            const saved = localStorage.getItem('powerFxCustomPresets');
-            return saved ? JSON.parse(saved) : {};
-        }
-
-        function saveCustomPreset(name, settings) {
-            const customPresets = loadCustomPresets();
-            customPresets[name] = {
-                ...settings,
-                name: settings.name || name,
-                description: settings.description || 'Custom preset',
-            };
-            localStorage.setItem('powerFxCustomPresets', JSON.stringify(customPresets));
-            rebuildStyleSelector();
-        }
-
-        function deleteCustomPreset(name) {
-            const customPresets = loadCustomPresets();
-            delete customPresets[name];
-            localStorage.setItem('powerFxCustomPresets', JSON.stringify(customPresets));
-            rebuildStyleSelector();
-        }
-
-        function compareSettings(saved, current) {
-            // Compare relevant formatting settings
-            const keys = [
-                'indentSize', 'indentBraceContent', 'spaceBeforeParentheses',
-                'spaceInsideParentheses', 'spaceAfterComma', 'commaStyle',
-                'breakAfterOperators', 'oneParamPerLine', 'breakAfterFirstParam',
-                'paramOnSameLine', 'breakAroundKeywords', 'keywords',
-                'semiColonAtEnd', 'semicolonNewline', 'blockCommaNewline', 'blockSemicolonNewline', 'extraLinesBetweenStatements',
-                'extraLinesAfterBraces'
-            ];
-            
-            for (const key of keys) {
-                if (saved[key] !== current[key]) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        function saveFunctionRules() {
-            localStorage.setItem('powerFxFunctionRules', JSON.stringify(functionRules));
-        }
-
-        function rebuildStyleSelector(selected = null) {
-            const select = document.getElementById('styleSelect');
-            if (!select) return;
-
-            const customPresets = loadCustomPresets();
-            select.innerHTML = '';
-
-            const defaults = document.createElement('optgroup');
-            defaults.label = 'Default styles';
-            Object.entries(STYLE_PRESETS).forEach(([key, preset]) => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = preset.name;
-                defaults.appendChild(option);
+        const copySelection = () => {
+            if (!selectionData) return;
+            const payload = [
+                `Type: ${selectionData.kind}`,
+                `Name: ${selectionData.name}`,
+                selectionData.owner ? `Owner: ${selectionData.owner}` : null,
+                selectionData.note ? `Note: ${selectionData.note}` : null,
+                selectionData.label ? `Label: ${selectionData.label}` : null,
+                selectionData.point ? `Point: ${selectionData.point.lat}, ${selectionData.point.lon}` : null
+            ].filter(Boolean).join('\n');
+            navigator.clipboard.writeText(payload).then(() => {
+                statusEl.textContent = 'Copied selection to clipboard.';
             });
-            select.appendChild(defaults);
+        };
 
-            const customKeys = Object.keys(customPresets);
-            if (customKeys.length) {
-                const customGroup = document.createElement('optgroup');
-                customGroup.label = 'Custom presets';
-                customKeys.forEach(key => {
-                    const option = document.createElement('option');
-                    option.value = key;
-                    option.textContent = customPresets[key].name || key;
-                    option.dataset.custom = 'true';
-                    customGroup.appendChild(option);
-                });
-                select.appendChild(customGroup);
-            }
-
-            const toSelect = selected || currentStyle || 'ultra-compact';
-            const hasOption = Array.from(select.options).some(opt => opt.value === toSelect);
-            select.value = hasOption ? toSelect : 'ultra-compact';
-        }
-
-        function setupStyleSelector() {
-            rebuildStyleSelector('ultra-compact');
-        }
-
-        function resolvePreset(styleName) {
-            const customPresets = loadCustomPresets();
-            return customPresets[styleName] || STYLE_PRESETS[styleName];
-        }
-
-        function handleStyleChange(styleName) {
-            const preset = resolvePreset(styleName);
-            applyStyle(styleName, preset);
-        }
-
-        function applyStyle(styleName, customPreset = null) {
-            const preset = customPreset || resolvePreset(styleName);
-            if (!preset) return;
-
-            currentStyle = styleName;
-            presetSettings = { ...preset };
-            isModified = false;
-            autoPresetCaptured = false;
-
-            document.getElementById('styleDescription').textContent = preset.description || styleName;
-            document.getElementById('activeStyleBadge').textContent = preset.name || styleName;
-            const customPresets = loadCustomPresets();
-            document.getElementById('styleStatus').textContent = customPresets[styleName] ? 'Custom preset' : 'Default preset';
-
-            const select = document.getElementById('styleSelect');
-            if (select) {
-                rebuildStyleSelector(styleName);
-            }
-
-            // Apply all settings from preset
-            Object.keys(preset).forEach(key => {
-                const el = document.getElementById(key);
-                if (el) {
-                    if (el.type === 'checkbox') {
-                        el.checked = preset[key];
-                    } else if (el.type === 'number' || el.tagName === 'INPUT') {
-                        el.value = preset[key];
-                    } else if (el.tagName === 'SELECT') {
-                        el.value = preset[key];
-                    }
-                }
+        const buildLegend = (territories) => {
+            const typeColors = new Map();
+            territories.forEach(t => {
+                if (!typeColors.has(t.properties.type)) typeColors.set(t.properties.type, t.properties.color);
             });
-
-            updateStatus();
-            autoFormat(true);
-        }
-
-        function markModified() {
-            isModified = true;
-            persistAutoPreset();
-            updateStatus();
-        }
-
-        function persistAutoPreset() {
-            const settings = getSettings();
-            const customPresets = loadCustomPresets();
-            const isCustom = Boolean(customPresets[currentStyle]);
-            const preset = resolvePreset(currentStyle);
-
-            if (!preset) return;
-
-            if (!isCustom && !autoPresetCaptured) {
-                const baseName = preset.name || currentStyle;
-                const customKey = `${currentStyle}-custom`;
-                const payload = {
-                    ...settings,
-                    name: `${baseName} (custom)`,
-                    description: 'Auto-saved from ' + baseName,
-                };
-                saveCustomPreset(customKey, payload);
-                currentStyle = customKey;
-                presetSettings = { ...payload };
-                autoPresetCaptured = true;
-                rebuildStyleSelector(customKey);
-                const select = document.getElementById('styleSelect');
-                if (select) select.value = customKey;
-                document.getElementById('activeStyleBadge').textContent = payload.name;
-                document.getElementById('styleDescription').textContent = payload.description;
-                document.getElementById('styleStatus').textContent = 'Custom preset (auto)';
-            } else if (isCustom) {
-                saveCustomPreset(currentStyle, { ...preset, ...settings });
-                document.getElementById('styleStatus').textContent = 'Custom preset';
-            }
-        }
-
-        function getSettings() {
-            const settings = {};
-            const settingIds = ['indentSize', 'indentParams', 'indentAfterComma', 'indentBraceContent', 'operatorSpacing', 'keepMathOperatorsTogether', 'spaceAfterComma', 'commaStyle', 'spaceBeforeParen', 'spaceBeforeBrace', 'operatorNewLine', 'paramOnSameLine', 'breakAfterFirstParam', 'oneParamPerLine', 'trailingComma', 'openParenNewline', 'closeParenNewline', 'openBraceNewline', 'closeBraceNewline', 'semicolonNewline', 'blockCommaNewline', 'blockSemicolonNewline', 'extraLinesBetweenStatements', 'extraLinesAfterBraces'];
-            
-            settingIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    if (el.type === 'checkbox') {
-                        settings[id] = el.checked;
-                    } else if (el.type === 'number') {
-                        settings[id] = Math.max(0, parseInt(el.value) || 0);
-                    } else if (el.tagName === 'SELECT') {
-                        settings[id] = el.value;
-                    }
-                }
+            const ul = document.createElement('ul');
+            typeColors.forEach((color, type) => {
+                const li = document.createElement('li');
+                const swatch = document.createElement('span');
+                swatch.className = 'swatch';
+                swatch.style.background = color;
+                li.appendChild(swatch);
+                li.appendChild(document.createTextNode(type));
+                ul.appendChild(li);
             });
-            return settings;
-        }
+            legendEl.innerHTML = '<h4>Territory Types</h4>';
+            legendEl.appendChild(ul);
+        };
 
-        function autoFormat(force = false) {
-            if (!force && !liveFormattingEnabled) return;
-            if (document.getElementById('input').value.trim()) {
-                formatCode();
+        const populateSearch = (territories, addresses) => {
+            const options = [];
+            territories.forEach(t => options.push(t.properties.name));
+            addresses.forEach(a => options.push(a.label));
+            datalist.innerHTML = '';
+            options.sort().forEach(text => {
+                const opt = document.createElement('option');
+                opt.value = text;
+                datalist.appendChild(opt);
+            });
+        };
+
+        const clearSelection = () => {
+            svg.selectAll('.state').classed('selected', false);
+            svg.selectAll('.territory').classed('selected', false);
+            svg.selectAll('.point').remove();
+            selectionData = null;
+            selectionEl.innerHTML = 'Click a state or territory, or search above.';
+        };
+
+        const markPoint = (coords) => {
+            const [x, y] = projection([coords.lon, coords.lat]) || [];
+            if (!x || !y) return;
+            pointLayer = svg.append('circle')
+                .attr('class', 'point')
+                .attr('r', 5)
+                .attr('cx', x)
+                .attr('cy', y);
+        };
+
+        const assignSelection = (data) => {
+            selectionData = data;
+            selectionEl.innerHTML = formatSelection(data);
+        };
+
+        const locateState = (pt) => stateFeatures.find((f) => d3.geoContains(f, pt));
+        const locateTerritory = (pt) => territoryFeatures.find((f) => d3.geoContains(f, pt));
+
+        const handleGeocode = () => {
+            const query = searchInput.value.trim().toLowerCase();
+            const latVal = parseFloat(latInput.value);
+            const lonVal = parseFloat(lonInput.value);
+            clearSelection();
+
+            if (!query && (isNaN(latVal) || isNaN(lonVal))) {
+                statusEl.textContent = 'Enter a search term or lat/lon.';
+                return;
             }
-        }
 
-        function toggleTheme() {
-            const isDark = document.body.classList.toggle('theme-dark');
-            document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
-            localStorage.setItem('powerFxTheme', isDark ? 'dark' : 'light');
-        }
-
-        function toggleLayout() {
-            userLayoutPreference = userLayoutPreference === 'horizontal' ? 'vertical' : 'horizontal';
-            localStorage.setItem('powerFxLayout', userLayoutPreference);
-            updateLayoutDisplay();
-        }
-
-        function toggleInputPanel() {
-            const container = document.querySelector('.container');
-            const toggleBtn = document.getElementById('inputToggle');
-            const collapsed = container.classList.toggle('input-collapsed');
-            toggleBtn.textContent = collapsed ? '🪟' : '👁️';
-            localStorage.setItem('powerFxInputCollapsed', collapsed ? 'true' : 'false');
-        }
-
-        function updateLayoutDisplay() {
-            const mainContent = document.getElementById('mainContent');
-            const layoutBtn = document.getElementById('layoutToggle');
-            const leftPanel = document.querySelector('.left-panel');
-            const rightPanel = document.querySelector('.right-panel');
-            
-            // Reset flex values when switching layout
-            leftPanel.style.flex = '1';
-            rightPanel.style.flex = '1';
-            
-            if (userLayoutPreference === 'vertical') {
-                mainContent.classList.add('vertical');
-                layoutBtn.textContent = '↕️';
+            let matchPoint = null;
+            if (!isNaN(latVal) && !isNaN(lonVal)) {
+                matchPoint = { lat: latVal, lon: lonVal, label: 'Custom point' };
             } else {
-                mainContent.classList.remove('vertical');
-                layoutBtn.textContent = '↔️';
-            }
-        }
-
-        function toggleSettingsPanel() {
-            const panel = document.getElementById('settingsPanel');
-            const btn = document.getElementById('collapseBtn');
-            const container = document.querySelector('.container');
-
-            const isCollapsed = panel.classList.toggle('collapsed');
-            btn.classList.toggle('collapsed', isCollapsed);
-            container.classList.toggle('settings-collapsed', isCollapsed);
-        }
-
-        function toggleCard(btn) {
-            const card = btn.closest('.settings-card');
-            if (!card) return;
-            const collapsed = card.classList.toggle('collapsed');
-            btn.textContent = collapsed ? '▶' : '▾';
-            saveCardOrder();
-        }
-
-        function initializeCardControls() {
-            applySavedCardOrder();
-            const cards = document.querySelectorAll('.settings-grid .settings-card');
-            cards.forEach(card => {
-                card.setAttribute('draggable', true);
-                card.addEventListener('dragstart', (e) => {
-                    if (!e.target.closest('.drag-handle')) {
-                        e.preventDefault();
+                const match = addressIndex.find(a => a.label.toLowerCase().includes(query));
+                if (match) {
+                    matchPoint = { ...match };
+                } else {
+                    const territory = territoryFeatures.find(t => t.properties.name.toLowerCase().includes(query));
+                    if (territory) {
+                        svg.select(`#territory-${territory.properties.id}`).classed('selected', true);
+                        assignSelection({
+                            kind: 'Territory',
+                            name: territory.properties.name,
+                            owner: territory.properties.owner,
+                            label: territory.properties.label,
+                            note: territory.properties.description
+                        });
+                        statusEl.textContent = 'Jumped to territory.';
                         return;
                     }
-                    draggingCard = card;
-                    e.dataTransfer.effectAllowed = 'move';
-                });
-                card.addEventListener('dragover', (e) => {
-                    if (!draggingCard || draggingCard === card) return;
-                    e.preventDefault();
-                    const grid = card.parentElement;
-                    const cardsArr = Array.from(grid.querySelectorAll('.settings-card'));
-                    const targetIndex = cardsArr.indexOf(card);
-                    const dragIndex = cardsArr.indexOf(draggingCard);
-                    if (targetIndex > dragIndex) {
-                        grid.insertBefore(draggingCard, card.nextSibling);
-                    } else {
-                        grid.insertBefore(draggingCard, card);
-                    }
-                });
-                card.addEventListener('dragend', () => {
-                    if (!draggingCard) return;
-                    draggingCard = null;
-                    saveCardOrder();
-                });
+                    statusEl.textContent = 'No address match found.';
+                    return;
+                }
+            }
+
+            markPoint(matchPoint);
+            const pt = [matchPoint.lon, matchPoint.lat];
+            const containingTerritory = locateTerritory(pt);
+            const containingState = locateState(pt);
+
+            if (containingState) {
+                svg.select(`#state-${containingState.id}`).classed('selected', true);
+            }
+            if (containingTerritory) {
+                svg.select(`#territory-${containingTerritory.properties.id}`).classed('selected', true);
+            }
+
+            assignSelection({
+                kind: containingTerritory ? 'Territory' : 'State',
+                name: containingTerritory ? containingTerritory.properties.name : (containingState?.properties.name || 'Outside coverage'),
+                owner: containingTerritory?.properties.owner,
+                label: containingTerritory?.properties.label,
+                note: matchPoint.note,
+                point: { lat: matchPoint.lat, lon: matchPoint.lon }
             });
-            saveCardOrder();
-        }
+            statusEl.textContent = 'Located point and highlighted coverage.';
+        };
 
-        function saveCardOrder() {
-            const cards = Array.from(document.querySelectorAll('.settings-grid .settings-card'));
-            const order = cards.map(card => card.dataset.cardKey || '');
-            localStorage.setItem(CARD_ORDER_KEY, JSON.stringify(order));
-        }
+        fetch('data/map-data.json')
+            .then(res => res.json())
+            .then(data => {
+                const states = topojson.feature(data.statesTopojson, data.statesTopojson.objects.states);
+                stateFeatures = states.features;
+                projection = d3.geoAlbersUsa().fitSize([960, 600], states);
+                path = d3.geoPath(projection);
 
-        function applySavedCardOrder() {
-            const saved = localStorage.getItem(CARD_ORDER_KEY);
-            if (!saved) return;
-            const order = JSON.parse(saved);
-            const grid = document.querySelector('.settings-grid');
-            if (!grid || !Array.isArray(order)) return;
-            order.forEach(key => {
-                const card = grid.querySelector(`.settings-card[data-card-key="${key}"]`);
-                if (card) grid.appendChild(card);
-            });
-        }
-
-        function updateFontSize() {
-            const size = document.getElementById('fontSize').value;
-            document.querySelectorAll('textarea').forEach(ta => {
-                ta.className = ta.className.replace(/font-\w+/g, '');
-                ta.classList.add(`font-${size}`);
-            });
-            localStorage.setItem('powerFxFontSize', size);
-            refreshAllLineNumbers();
-        }
-
-        function setWidth(width) {
-            const container = document.querySelector('.container');
-            if (container.style.width === width) {
-                container.style.width = '100%';
-                showNotification('↔️ Reset to full width');
-            } else {
-                container.style.width = width;
-                showNotification(`↔️ Width: ${width}`);
-            }
-            refreshAllLineNumbers();
-        }
-
-        function applyLineNumberVisibility() {
-            document.querySelectorAll('.editor-wrapper').forEach(wrapper => {
-                wrapper.classList.toggle('hide-line-numbers', !lineNumbersVisible);
-            });
-            refreshAllLineNumbers();
-        }
-
-        function toggleLineNumbersVisibility() {
-            const toggle = document.getElementById('showLineNumbers');
-            if (!toggle || toggle.disabled) {
-                lineNumbersVisible = false;
-                applyLineNumberVisibility();
-                localStorage.setItem('powerFxShowLineNumbers', 'false');
-                showNotification('👁️‍🗨️ Line numbers are temporarily disabled');
-                return;
-            }
-            lineNumbersVisible = toggle.checked;
-            localStorage.setItem('powerFxShowLineNumbers', lineNumbersVisible);
-            applyLineNumberVisibility();
-            showNotification(lineNumbersVisible ? '🔢 Line numbers shown' : '👁️‍🗨️ Line numbers hidden');
-        }
-
-        function toggleLiveFormatting() {
-            liveFormattingEnabled = document.getElementById('liveFormatting').checked;
-            localStorage.setItem('powerFxLiveFormatting', liveFormattingEnabled);
-            showNotification(liveFormattingEnabled ? '⚡ Live formatting on' : '✋ Live formatting paused');
-        }
-
-        function resetToPreset() {
-            applyStyle(currentStyle);
-            showNotification('↻ Reset to preset');
-        }
-
-        function saveCurrentAsPreset() {
-            const presetName = prompt('Enter custom preset name:', 'My Preset');
-            if (!presetName || presetName.trim() === '') return;
-            
-            const settings = getSettings();
-            saveCustomPreset(presetName.trim(), settings);
-            showNotification(`💾 Saved as "${presetName.trim()}"`);
-        }
-
-        function saveAsDefault() {
-            localStorage.setItem('powerFxDefaultStyle', currentStyle);
-            localStorage.setItem('powerFxCustomSettings', JSON.stringify(getSettings()));
-            showNotification('✓ Saved as default');
-        }
-
-        function updateStatus() {
-            const preset = resolvePreset(currentStyle) || {};
-            document.getElementById('statusStyle').textContent = preset.name || currentStyle;
-            document.getElementById('statusModified').textContent = isModified ? '✓ Custom' : 'No';
-            document.getElementById('statusFuncRules').textContent = Object.keys(functionRules).length;
-            updateDiagnostics();
-        }
-
-        function analyzeCodeHealth(code) {
-            const lines = code.split(/\r?\n/);
-            let paren = 0, brace = 0;
-            let inString = false;
-            let stringChar = '';
-            let trailingSpaces = 0;
-
-            lines.forEach(line => {
-                if (/\s+$/.test(line)) trailingSpaces++;
-            });
-
-            for (let i = 0; i < code.length; i++) {
-                const char = code[i];
-                const prev = code[i - 1];
-                if ((char === '"' || char === "'") && (!inString || stringChar === char) && prev !== '\\') {
-                    inString = !inString;
-                    stringChar = char;
-                    continue;
-                }
-                if (inString) continue;
-                if (char === '(') paren++;
-                if (char === ')') paren--;
-                if (char === '{') brace++;
-                if (char === '}') brace--;
-            }
-
-            const warnings = [];
-            if (paren > 0) warnings.push(`Missing ${paren} closing parenthesis`);
-            if (paren < 0) warnings.push(`Remove ${Math.abs(paren)} stray closing parenthesis`);
-            if (brace > 0) warnings.push(`Missing ${brace} closing brace`);
-            if (brace < 0) warnings.push(`Remove ${Math.abs(brace)} stray closing brace`);
-            if (inString) warnings.push('Unclosed string literal');
-            if (trailingSpaces > 0) warnings.push(`${trailingSpaces} line(s) with trailing whitespace`);
-
-            return {
-                lineCount: lines.filter(line => line !== '').length,
-                totalLines: lines.length,
-                charCount: code.length,
-                warnings,
-                trailingSpaces
-            };
-        }
-
-        function updateDiagnostics() {
-            const input = document.getElementById('input').value;
-            const stats = analyzeCodeHealth(input);
-
-            document.getElementById('lineCountChip').textContent = `${stats.totalLines} line${stats.totalLines === 1 ? '' : 's'}`;
-            document.getElementById('charCountChip').textContent = `${stats.charCount} char${stats.charCount === 1 ? '' : 's'}`;
-            document.getElementById('functionChip').textContent = `${detectedFunctions.size} function${detectedFunctions.size === 1 ? '' : 's'}`;
-
-            const diagnosticChip = document.getElementById('diagnosticChip');
-            diagnosticChip.classList.remove('alert', 'success', 'muted');
-
-            const warningList = document.getElementById('warningList');
-            if (!input.trim()) {
-                diagnosticChip.textContent = 'Waiting for input';
-                diagnosticChip.classList.add('muted');
-                warningList.innerHTML = '<div class="warning-item ok">Start typing to see live checks.</div>';
-                return;
-            }
-
-            if (stats.warnings.length === 0) {
-                diagnosticChip.textContent = 'All clear';
-                diagnosticChip.classList.add('success');
-                warningList.innerHTML = '<div class="warning-item ok">✅ No structural warnings detected.</div>';
-            } else {
-                diagnosticChip.textContent = `${stats.warnings.length} warning${stats.warnings.length === 1 ? '' : 's'}`;
-                diagnosticChip.classList.add('alert');
-                warningList.innerHTML = stats.warnings.map(item => `<div class="warning-item">⚠️ ${item}</div>`).join('');
-            }
-        }
-
-        function insertSnippet(key) {
-            const snippets = {
-                'if': `If(
-    User().Email = "maker@contoso.com",
-    Patch(Accounts, Defaults(Accounts), { Name: "Premium" }),
-    Notify("No access", NotificationType.Error)
-);`,
-                'with': `With(
-    { activeRecord: LookUp(Accounts, Name = "'Alpine'") },
-    If(
-        !IsBlank(activeRecord),
-        Patch(Accounts, activeRecord, { Status: "Active" }),
-        Notify("Missing account", NotificationType.Warning)
-    )
-);`,
-                'collection': `ClearCollect(
-    colOrders,
-    ForAll(
-        Orders,
-        { Id: ThisRecord.Id, Total: Sum(LineItems, Quantity * Price) }
-    )
-);`,
-                'toggle': `Switch(
-    true,
-    Toggle1.Value, Set(mode, "Edit"),
-    Dropdown1.Selected.Value = "New", Set(mode, "Create"),
-    Set(mode, "Read")
-);`
-            };
-            const snippet = snippets[key];
-            if (snippet) {
-                document.getElementById('input').value = snippet;
-                updateDiagnostics();
-                refreshAllLineNumbers();
-                autoFormat(true);
-                showNotification('✨ Snippet inserted');
-            }
-        }
-
-        function importCodeFile() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.fx,.txt,.json,.yaml,.yml,.md,.ps1,.js,.ts,.cs,.sql,.txt';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    document.getElementById('input').value = reader.result;
-                    updateDiagnostics();
-                    refreshAllLineNumbers();
-                    autoFormat(true);
-                    showNotification(`📂 Loaded ${file.name}`);
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-
-        function downloadOutput() {
-            const output = document.getElementById('output').value;
-            if (!output.trim()) {
-                showNotification('⚠️ Nothing to download');
-                return;
-            }
-            const blob = new Blob([output], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'formatted.fx';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showNotification('⬇️ Downloaded formatted file');
-        }
-
-        function resetWorkspace() {
-            clearInput();
-            clearOutput();
-            detectedFunctions.clear();
-            updateFunctionList();
-            updateDiagnostics();
-            refreshAllLineNumbers();
-            showNotification('♻️ Workspace reset');
-        }
-
-        function updateFunctionList() {
-            const list = document.getElementById('funcList');
-            const funcs = Array.from(detectedFunctions).sort();
-            
-            if (funcs.length === 0) {
-                list.innerHTML = '<div style="font-size: 11px; color: #718096; padding: 12px; text-align: center;">Format code to detect functions</div>';
-                document.getElementById('addFuncBtn').style.display = 'block';
-                return;
-            }
-
-            list.innerHTML = funcs.map(func => `
-                <div class="func-item ${functionRules[func] ? 'active' : ''}" onclick="selectFunction('${func}')">
-                    <span>${func}</span>
-                    <span>${functionRules[func] ? '✓' : ''}</span>
-                </div>
-            `).join('');
-        }
-
-        function selectFunction(funcName) {
-            selectedFunction = funcName;
-            document.getElementById('funcEditor').style.display = 'block';
-            document.getElementById('selectedFuncName').textContent = funcName;
-            
-            const rule = functionRules[funcName] || {};
-            document.getElementById('funcParamOnSameLine').checked = rule.paramOnSameLine !== false;
-            document.getElementById('funcBreakAfterFirst').checked = rule.breakAfterFirstParam === true;
-            document.getElementById('funcOneParamPerLine').checked = rule.oneParamPerLine === true;
-            document.getElementById('funcIndentParams').checked = rule.indentParams === true;
-            document.getElementById('funcOpenParenNewline').checked = rule.openParenNewline === true;
-            document.getElementById('funcCloseParenNewline').checked = rule.closeParenNewline === true;
-            document.getElementById('funcCommaStyle').value = rule.commaStyle || '';
-            document.getElementById('funcSpaceBeforeBrace').checked = rule.spaceBeforeBrace === true;
-            document.getElementById('funcOpenBraceNewline').checked = rule.openBraceNewline === true;
-            document.getElementById('funcCloseBraceNewline').checked = rule.closeBraceNewline === true;
-            document.getElementById('funcIndentBraceContent').checked = rule.indentBraceContent === true;
-            
-            previewFunctionRule();
-            
-            document.querySelectorAll('.func-item').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
-
-        function previewFunctionRule() {
-            const sameOneLine = document.getElementById('funcParamOnSameLine').checked;
-            const breakAfterFirst = document.getElementById('funcBreakAfterFirst').checked;
-            const onePerLine = document.getElementById('funcOneParamPerLine').checked;
-            const openNewline = document.getElementById('funcOpenParenNewline').checked;
-            const closeNewline = document.getElementById('funcCloseParenNewline').checked;
-            const indentParams = document.getElementById('funcIndentParams').checked;
-            
-            let preview = `${selectedFunction}(`;
-            const indent = indentParams ? '  ' : '';
-            
-            if (onePerLine) {
-                preview += `\n${indent}param1,\n${indent}param2,\n${indent}param3`;
-                if (closeNewline) preview += '\n';
-                preview += ')';
-            } else if (breakAfterFirst) {
-                preview += `param1,\n${indent}param2, param3`;
-                if (closeNewline) preview += '\n';
-                preview += ')';
-            } else if (openNewline) {
-                preview += `\n${indent}param1, param2, param3`;
-                if (closeNewline) preview += '\n';
-                preview += ')';
-            } else if (sameOneLine) {
-                preview += 'param1, param2, param3)';
-            } else {
-                preview += `\n${indent}param1,\n${indent}param2,\n${indent}param3`;
-                if (closeNewline) preview += '\n';
-                preview += ')';
-            }
-            
-            document.getElementById('rulePreview').textContent = preview;
-        }
-
-        function saveFunctionRule() {
-            if (!selectedFunction) return;
-            
-            functionRules[selectedFunction] = {
-                paramOnSameLine: document.getElementById('funcParamOnSameLine').checked,
-                breakAfterFirstParam: document.getElementById('funcBreakAfterFirst').checked,
-                oneParamPerLine: document.getElementById('funcOneParamPerLine').checked,
-                indentParams: document.getElementById('funcIndentParams').checked,
-                openParenNewline: document.getElementById('funcOpenParenNewline').checked,
-                closeParenNewline: document.getElementById('funcCloseParenNewline').checked,
-                commaStyle: document.getElementById('funcCommaStyle').value || undefined,
-                spaceBeforeBrace: document.getElementById('funcSpaceBeforeBrace').checked,
-                openBraceNewline: document.getElementById('funcOpenBraceNewline').checked,
-                closeBraceNewline: document.getElementById('funcCloseBraceNewline').checked,
-                indentBraceContent: document.getElementById('funcIndentBraceContent').checked,
-            };
-            
-            saveFunctionRules();
-            updateFunctionList();
-            autoFormat();
-            showNotification(`✓ Rule saved for ${selectedFunction}`);
-        }
-
-        function clearFunctionRule() {
-            if (!selectedFunction) return;
-            delete functionRules[selectedFunction];
-            saveFunctionRules();
-            updateFunctionList();
-            document.getElementById('funcEditor').style.display = 'none';
-            autoFormat();
-            showNotification(`✓ Rule cleared for ${selectedFunction}`);
-        }
-
-        function createNewFunctionRule() {
-            const funcName = prompt('Enter function name (e.g., Patch, Set):');
-            if (!funcName) return;
-            selectFunction(funcName);
-        }
-
-        function clearAllRules() {
-            if (confirm('Clear all function rules? This cannot be undone.')) {
-                functionRules = {};
-                saveFunctionRules();
-                updateFunctionList();
-                document.getElementById('funcEditor').style.display = 'none';
-                autoFormat();
-                updateStatus();
-                showNotification('⚠️ All rules cleared');
-            }
-        }
-
-        function exportSettings() {
-            const data = {
-                style: currentStyle,
-                globalSettings: getSettings(),
-                functionRules: functionRules
-            };
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'powerfx-formatter-settings.json';
-            a.click();
-            showNotification('↓ Settings exported');
-        }
-
-        function importSettings() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'application/json';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        applyStyle(data.style);
-                        Object.keys(data.globalSettings).forEach(key => {
-                            const el = document.getElementById(key);
-                            if (el) {
-                                if (el.type === 'checkbox') {
-                                    el.checked = data.globalSettings[key];
-                                } else {
-                                    el.value = data.globalSettings[key];
-                                }
-                            }
-                        });
-                        functionRules = data.functionRules || {};
-                        saveFunctionRules();
-                        updateFunctionList();
-                        autoFormat();
-                        updateStatus();
-                        showNotification('↑ Settings imported');
-                    } catch (err) {
-                        showNotification('⚠️ Invalid settings file');
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-
-        function showNotification(msg) {
-            const notif = document.getElementById('notification');
-            notif.textContent = msg;
-            notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 2000);
-        }
-
-        function getLineMeasureElement(areaId, textarea) {
-            if (!lineMeasureElements[areaId]) {
-                const measure = document.createElement('div');
-                measure.style.position = 'absolute';
-                measure.style.visibility = 'hidden';
-                measure.style.whiteSpace = 'pre-wrap';
-                measure.style.wordBreak = 'break-word';
-                measure.style.top = '-9999px';
-                measure.style.left = '-9999px';
-                measure.style.padding = '0';
-                measure.style.margin = '0';
-                measure.style.border = '0';
-                measure.style.boxSizing = 'border-box';
-                document.body.appendChild(measure);
-                lineMeasureElements[areaId] = measure;
-            }
-
-            const measure = lineMeasureElements[areaId];
-            const style = window.getComputedStyle(textarea);
-            const paddingLeft = parseFloat(style.paddingLeft) || 0;
-            const paddingRight = parseFloat(style.paddingRight) || 0;
-            const contentWidth = Math.max(0, textarea.clientWidth - paddingLeft - paddingRight);
-            const wrapMode = textarea.getAttribute('wrap') || textarea.wrap || 'soft';
-            measure.style.fontFamily = style.fontFamily;
-            measure.style.fontSize = style.fontSize;
-            measure.style.lineHeight = style.lineHeight;
-            measure.style.width = `${contentWidth}px`;
-            measure.style.whiteSpace = wrapMode === 'off' ? 'pre' : 'pre-wrap';
-            measure.style.wordBreak = wrapMode === 'off' ? 'normal' : 'break-word';
-            return measure;
-        }
-
-        function updateLineNumbers(areaId, gutterId) {
-            const textarea = document.getElementById(areaId);
-            const gutter = document.getElementById(gutterId);
-            if (!textarea || !gutter) return;
-
-            if (!lineNumbersVisible) {
-                gutter.innerHTML = '';
-                return;
-            }
-
-            const style = window.getComputedStyle(textarea);
-            const lineHeight = parseFloat(style.lineHeight) || 16;
-            const measure = getLineMeasureElement(areaId, textarea);
-
-            const lines = textarea.value.split('\n');
-            const html = lines.map((line, i) => {
-                measure.textContent = line || ' ';
-                const rows = Math.max(1, Math.ceil(measure.scrollHeight / lineHeight));
-                const height = rows * lineHeight;
-                return `<div class="line-number" style="height:${height}px">${i + 1}</div>`;
-            }).join('');
-
-            gutter.innerHTML = html || '<div class="line-number">1</div>';
-            gutter.scrollTop = textarea.scrollTop;
-        }
-
-        function syncLineScroll(areaId, gutterId) {
-            const textarea = document.getElementById(areaId);
-            const gutter = document.getElementById(gutterId);
-            if (textarea && gutter) {
-                gutter.scrollTop = textarea.scrollTop;
-            }
-        }
-
-        function setupLineNumberListeners() {
-            ['input', 'output'].forEach(id => {
-                const gutterId = `${id}Lines`;
-                const textarea = document.getElementById(id);
-                if (!textarea) return;
-                textarea.addEventListener('input', () => updateLineNumbers(id, gutterId));
-                textarea.addEventListener('scroll', () => syncLineScroll(id, gutterId));
-            });
-        }
-
-        function refreshAllLineNumbers() {
-            updateLineNumbers('input', 'inputLines');
-            updateLineNumbers('output', 'outputLines');
-        }
-
-        const resizer = document.getElementById('resizer');
-        let isResizing = false;
-
-        resizer.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            resizingElement = document.querySelector('.editor-section');
-            resizer.classList.add('active');
-            document.body.style.userSelect = 'none';
-            e.preventDefault();
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (!isResizing || !resizingElement) return;
-            
-            const rect = resizingElement.getBoundingClientRect();
-            
-            const leftPanel = document.querySelector('.left-panel');
-            const rightPanel = document.querySelector('.right-panel');
-            
-            if (userLayoutPreference === 'horizontal') {
-                const newWidth = e.clientX - rect.left;
-                const percentage = (newWidth / rect.width) * 100;
-                
-                if (percentage > 20 && percentage < 80) {
-                    leftPanel.style.flex = `0 0 ${percentage}%`;
-                    rightPanel.style.flex = `0 0 ${100 - percentage}%`;
-                }
-            } else {
-                const newHeight = e.clientY - rect.top;
-                const percentage = (newHeight / rect.height) * 100;
-                
-                if (percentage > 20 && percentage < 80) {
-                    leftPanel.style.flex = `0 0 ${percentage}%`;
-                    rightPanel.style.flex = `0 0 ${100 - percentage}%`;
-                }
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (isResizing) {
-                isResizing = false;
-                resizingElement = null;
-                resizer.classList.remove('active');
-                document.body.style.userSelect = '';
-                refreshAllLineNumbers();
-            }
-        });
-
-        function formatCode() {
-            const input = document.getElementById('input').value;
-            if (!input.trim()) {
-                document.getElementById('output').value = '';
-                detectedFunctions.clear();
-                updateFunctionList();
-                updateDiagnostics();
-                return;
-            }
-
-            const settings = getSettings();
-            const formatted = formatPowerFX(input, settings);
-            document.getElementById('output').value = formatted;
-            updateFunctionList();
-            updateDiagnostics();
-            refreshAllLineNumbers();
-        }
-
-        function formatPowerFX(code, settings) {
-            detectedFunctions.clear();
-            let result = '';
-            let depth = 0;
-            let i = 0;
-            let inString = false;
-            let stringChar = '';
-            let lastWasNewline = true;
-            let lastWasSemicolon = false;
-            let currentFunction = '';
-            let braceDepth = 0;
-            let parenDepth = 0;
-            const paramInfoStack = [];
-            
-            const indent = () => ' '.repeat(depth * settings.indentSize);
-            const mathOps = ['+', '-', '*', '/'];
-            
-            const addLine = (text, forceIndent = false) => {
-                if (lastWasNewline || forceIndent) {
-                    result += indent() + text.trim();
-                } else {
-                    result += text;
-                }
-                lastWasNewline = false;
-            };
-            
-            const newLine = () => {
-                if (!lastWasNewline) {
-                    result += '\n';
-                    lastWasNewline = true;
-                }
-            };
-            
-            while (i < code.length) {
-                const char = code[i];
-                const nextChar = code[i + 1] || '';
-                
-                if ((char === '"' || char === "'") && !inString) {
-                    inString = true;
-                    stringChar = char;
-                    addLine(char);
-                    i++;
-                    continue;
-                } else if (char === stringChar && inString) {
-                    if (code[i - 1] !== '\\' || code[i - 2] === '\\') {
-                        inString = false;
-                        addLine(char);
-                        i++;
-                        continue;
-                    }
-                }
-                
-                if (inString) {
-                    addLine(char);
-                    i++;
-                    continue;
-                }
-                
-                if (char === '/' && nextChar === '/') {
-                    let comment = '';
-                    while (i < code.length && code[i] !== '\n') {
-                        comment += code[i];
-                        i++;
-                    }
-                    if (!lastWasNewline) newLine();
-                    result += indent() + comment.trim();
-                    newLine();
-                    continue;
-                }
-                
-                if (char === ' ' || char === '\t' || char === '\r' || char === '\n') {
-                    if (!lastWasNewline && result.slice(-1) !== ' ' && nextChar.trim()) {
-                        addLine(' ');
-                    }
-                    i++;
-                    continue;
-                }
-
-                if (paramInfoStack.length && char.trim() && ![')', '(', '{', '}', ',', ';'].includes(char)) {
-                    paramInfoStack[paramInfoStack.length - 1].hasParam = true;
-                }
-
-                if ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || char === '_') {
-                    let funcName = '';
-                    let tempI = i;
-                    while (tempI < code.length && ((code[tempI] >= 'a' && code[tempI] <= 'z') || (code[tempI] >= 'A' && code[tempI] <= 'Z') || code[tempI] === '_' || (code[tempI] >= '0' && code[tempI] <= '9'))) {
-                        funcName += code[tempI];
-                        tempI++;
-                    }
-                    
-                    let checkI = tempI;
-                    while (checkI < code.length && (code[checkI] === ' ' || code[checkI] === '\t')) {
-                        checkI++;
-                    }
-                    
-                    if (checkI < code.length && code[checkI] === '(') {
-                        currentFunction = funcName;
-                        detectedFunctions.add(funcName);
-                    }
-                    
-                    addLine(funcName);
-                    i = tempI;
-                    continue;
-                }
-                
-                if (char === '(') {
-                    const rule = functionRules[currentFunction];
-                    parenDepth++;
-
-                    const paramOnSameLine = rule?.paramOnSameLine ?? settings.paramOnSameLine;
-                    const indentParams = rule?.indentParams ?? settings.indentParams;
-                    const onePerLine = rule?.oneParamPerLine ?? settings.oneParamPerLine;
-                    const breakAfterFirst = rule?.breakAfterFirstParam ?? settings.breakAfterFirstParam;
-
-                    const shouldIndentParams = indentParams && (!paramOnSameLine || onePerLine || breakAfterFirst);
-
-                    paramInfoStack.push({
-                        shouldIndentParams,
-                        paramOnSameLine,
-                        onePerLine,
-                        breakAfterFirst,
-                        trailingComma: rule?.trailingComma ?? settings.trailingComma,
-                        hasParam: false,
-                        commaCount: 0,
+                svg.append('g')
+                    .selectAll('path')
+                    .data(stateFeatures)
+                    .enter()
+                    .append('path')
+                    .attr('class', 'state')
+                    .attr('id', d => `state-${d.id}`)
+                    .attr('d', path)
+                    .on('click', (event, d) => {
+                        svg.selectAll('.selected').classed('selected', false);
+                        d3.select(event.currentTarget).classed('selected', true);
+                        assignSelection({ kind: 'State', name: d.properties.name });
                     });
 
-                    if (settings.spaceBeforeParen && result.slice(-1) !== ' ' && result.trim()) {
-                        addLine(' ');
-                    }
-                    addLine(char);
+                territoryFeatures = data.territories.map(t => ({
+                    type: 'Feature',
+                    properties: { ...t },
+                    geometry: t.geometry
+                }));
 
-                    const openParenBreak = rule?.openParenNewline || settings.openParenNewline;
-                    if (openParenBreak) {
-                        newLine();
-                    }
+                svg.append('g')
+                    .selectAll('path')
+                    .data(territoryFeatures)
+                    .enter()
+                    .append('path')
+                    .attr('class', 'territory')
+                    .attr('id', d => `territory-${d.properties.id}`)
+                    .attr('fill', d => d.properties.color)
+                    .attr('d', path)
+                    .on('click', (event, d) => {
+                        svg.selectAll('.selected').classed('selected', false);
+                        d3.select(event.currentTarget).classed('selected', true);
+                        assignSelection({
+                            kind: 'Territory',
+                            name: d.properties.name,
+                            owner: d.properties.owner,
+                            label: d.properties.label,
+                            note: d.properties.description
+                        });
+                    });
 
-                    if (!paramOnSameLine && !openParenBreak) {
-                        newLine();
-                    }
+                svg.append('g')
+                    .selectAll('text')
+                    .data(territoryFeatures)
+                    .enter()
+                    .append('text')
+                    .attr('class', 'territory-label')
+                    .attr('transform', d => `translate(${path.centroid(d)})`)
+                    .text(d => d.properties.label);
 
-                    if (shouldIndentParams) {
-                        depth++;
-                    }
-                    i++;
-                    continue;
-                }
-                
-                if (char === ')') {
-                    const rule = functionRules[currentFunction];
-                    const paramInfo = paramInfoStack.pop() || {};
+                buildLegend(territoryFeatures);
 
-                    parenDepth = Math.max(0, parenDepth - 1);
+                addressIndex = data.geocoder.addresses;
+                populateSearch(territoryFeatures, addressIndex);
+                statusEl.textContent = `Loaded ${addressIndex.length} geocoder entries.`;
+            });
 
-                    if (paramInfo.shouldIndentParams) {
-                        depth--;
-                    }
-
-                    const needsTrailingComma = (paramInfo.trailingComma ?? settings.trailingComma) && paramInfo.hasParam;
-                    const trimmed = result.trimEnd();
-                    const endsWithComma = trimmed.endsWith(',');
-
-                    if (needsTrailingComma && !endsWithComma && !trimmed.endsWith('(')) {
-                        addLine(',');
-                        if (paramInfo.onePerLine || paramInfo.breakAfterFirst) {
-                            newLine();
-                        }
-                    }
-
-                    if ((rule?.closeParenNewline || settings.closeParenNewline) && !lastWasNewline) {
-                        newLine();
-                    }
-                    addLine(char, rule?.closeParenNewline || settings.closeParenNewline);
-                    currentFunction = '';
-                    i++;
-                    continue;
-                }
-                
-                if (char === '{') {
-                    const rule = functionRules[currentFunction];
-                    const spaceBeforeBrace = rule?.spaceBeforeBrace ?? settings.spaceBeforeBrace;
-                    const openBraceNewline = rule?.openBraceNewline ?? settings.openBraceNewline;
-                    const indentBraceContent = rule?.indentBraceContent ?? settings.indentBraceContent;
-
-                    if (spaceBeforeBrace && result.slice(-1) !== ' ' && result.trim()) {
-                        addLine(' ');
-                    }
-                    addLine(char);
-                    if (openBraceNewline) {
-                        newLine();
-                    }
-                    if (indentBraceContent) {
-                        depth++;
-                    }
-                    braceDepth++;
-                    i++;
-                    continue;
-                }
-
-                if (char === '}') {
-                    const rule = functionRules[currentFunction];
-                    const indentBraceContent = rule?.indentBraceContent ?? settings.indentBraceContent;
-                    const closeBraceNewline = rule?.closeBraceNewline ?? settings.closeBraceNewline;
-
-                    if (indentBraceContent) {
-                        depth--;
-                    }
-                    braceDepth = Math.max(0, braceDepth - 1);
-                    if (closeBraceNewline && !lastWasNewline) {
-                        newLine();
-                    }
-                    addLine(char, closeBraceNewline);
-                    if (settings.extraLinesAfterBraces) {
-                        newLine();
-                    }
-                    i++;
-                    continue;
-                }
-                
-                if (char === ',') {
-                    const rule = functionRules[currentFunction];
-                    const paramInfo = paramInfoStack[paramInfoStack.length - 1];
-                    if (paramInfo) {
-                        paramInfo.hasParam = true;
-                        paramInfo.commaCount += 1;
-                    }
-                    addLine(char);
-
-                    const style = (rule?.commaStyle && rule.commaStyle !== '') ? rule.commaStyle : (settings.commaStyle || 'space');
-                    const hasSpace = style === 'space' || style === 'both';
-                    const hasBreak = style === 'break' || style === 'both';
-                    const insideBlock = braceDepth > 0 || parenDepth > 0;
-                    const blockBreak = settings.blockCommaNewline && insideBlock;
-
-                    const onePerLine = paramInfo?.onePerLine ?? rule?.oneParamPerLine ?? settings.oneParamPerLine;
-                    const breakAfterFirst = paramInfo?.breakAfterFirst ?? rule?.breakAfterFirstParam ?? settings.breakAfterFirstParam;
-                    const paramOnSameLine = paramInfo?.paramOnSameLine ?? rule?.paramOnSameLine ?? settings.paramOnSameLine;
-
-                    if (onePerLine) {
-                        newLine();
-                    } else if (breakAfterFirst && paramInfo?.commaCount === 1) {
-                        newLine();
-                    } else if (blockBreak) {
-                        newLine();
-                    } else if (paramOnSameLine) {
-                        if (hasSpace) addLine(' ');
-                        if (hasBreak) newLine();
-                    } else {
-                        newLine();
-                    }
-                    i++;
-                    continue;
-                }
-                
-                if (char === ';') {
-                    addLine(char);
-                    lastWasSemicolon = true;
-                    const insideBlock = braceDepth > 0 || parenDepth > 0;
-                    if (settings.semicolonNewline) {
-                        newLine();
-                        if (settings.extraLinesBetweenStatements && depth === 0) newLine();
-                    } else {
-                        if (settings.blockSemicolonNewline && insideBlock) {
-                            newLine();
-                        } else if (settings.spaceAfterComma) addLine(' ');
-                    }
-                    currentFunction = '';
-                    i++;
-                    continue;
-                }
-                
-                if (settings.operatorSpacing) {
-                    const allOps = ['&&', '||', '>=', '<=', '<>', '!=', '==', '=', '<', '>', '+', '-', '*', '/', '&'];
-                    let found = false;
-                    for (const op of allOps) {
-                        if (code.substr(i, op.length) === op) {
-                            if (settings.keepMathOperatorsTogether && mathOps.includes(op)) {
-                                if (result.slice(-1) !== ' ') addLine(' ');
-                                addLine(op);
-                                addLine(' ');
-                            } else {
-                                if (result.slice(-1) !== ' ') addLine(' ');
-                                addLine(op);
-                                if (settings.operatorNewLine) {
-                                    newLine();
-                                } else {
-                                    addLine(' ');
-                                }
-                            }
-                            i += op.length;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found) {
-                        continue;
-                    }
-                }
-                
-                addLine(char);
-                i++;
-            }
-            
-            result = result.split('\n').map(line => line.trimEnd()).join('\n');
-            result = result.replace(/\n{3,}/g, '\n\n');
-            return result.trim();
-        }
-
-        async function copyToClipboard() {
-            const output = document.getElementById('output');
-            if (!output.value.trim()) {
-                showNotification('⚠️ Nothing to copy');
-                return;
-            }
-            try {
-                await navigator.clipboard.writeText(output.value);
-                showNotification('✓ Copied');
-            } catch (err) {
-                output.select();
-                document.execCommand('copy');
-                showNotification('✓ Copied');
-            }
-        }
-
-        async function pasteFromClipboard() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('input').value = text;
-                updateDiagnostics();
-                refreshAllLineNumbers();
-                showNotification('✓ Pasted');
-            } catch (err) {
-                showNotification('⚠️ Paste denied. Use Ctrl+V');
-            }
-        }
-
-        function copyOutputToInput() {
-            const output = document.getElementById('output').value;
-            if (!output.trim()) {
-                showNotification('⚠️ Nothing to copy');
-                return;
-            }
-            document.getElementById('input').value = output;
-            refreshAllLineNumbers();
-            showNotification('✓ Copied to input');
-        }
-
-        function clearInput() {
-            document.getElementById('input').value = '';
-            updateDiagnostics();
-            refreshAllLineNumbers();
-        }
-
-        function clearOutput() {
-            document.getElementById('output').value = '';
-            refreshAllLineNumbers();
-        }
-
-        // Add event listeners for all settings to trigger autoFormat on change
-        const settingElements = document.querySelectorAll('input[type="checkbox"], input[type="number"], select');
-        settingElements.forEach(el => {
-            if (el.id && !['input', 'output', 'liveFormatting'].includes(el.id)) {
-                el.addEventListener('change', () => {
-                    markModified();
-                    autoFormat();
-                });
-            }
+        geocodeBtn.addEventListener('click', handleGeocode);
+        resetBtn.addEventListener('click', () => {
+            clearSelection();
+            statusEl.textContent = 'Reset selections.';
+            searchInput.value = '';
+            latInput.value = '';
+            lonInput.value = '';
         });
-
-        document.getElementById('input').addEventListener('input', autoFormat);
-        document.getElementById('input').addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'Enter') formatCode();
-            if (e.ctrlKey && e.key === ',') {
-                e.preventDefault();
-                toggleSettingsPanel();
-            }
-        });
-        document.getElementById('input').addEventListener('input', updateDiagnostics);
-        updateDiagnostics();
+        copyBtn.addEventListener('click', copySelection);
     </script>
 </body>
 </html>
